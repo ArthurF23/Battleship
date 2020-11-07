@@ -10,6 +10,8 @@ namespace std {
 		static int SEND(string msg);
 
 		static bool CONNECTED_TO_CLIENT;
+
+		static bool IS_STARTED;
 	};
 
 	class CLIENT {
@@ -19,6 +21,8 @@ namespace std {
 		static int SEND(string ip);
 
 		static bool CONNECTED_TO_SERVER;
+
+		static bool IS_STARTED;
 	};
 
 	class GAME {

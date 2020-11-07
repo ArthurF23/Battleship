@@ -1,5 +1,6 @@
 #include <iostream>
 #include <atomic>
+#include <sstream>
 using namespace std;
 
 #ifdef _WIN32 // for Windows systems
@@ -22,6 +23,11 @@ SOCKET clientSocket;
 SOCKET sock;
 #include "Game.h"
 namespace std {
+	bool SERVER::IS_STARTED = false;
+
+	bool CLIENT::IS_STARTED = false;
+
+
 	bool SERVER::CONNECTED_TO_CLIENT = false;
 
 	bool CLIENT::CONNECTED_TO_SERVER = false;
@@ -162,7 +168,7 @@ namespace std {
 #endif
 
 		// While loop: accept and echo message back to client
-		char buf[4096];
+		char buf[4096] = "";
 #ifdef _WIN32
 		while (true)
 		{
@@ -186,6 +192,16 @@ namespace std {
 
 			// Echo message back to client
 			send(clientSocket, buf, bytesReceived + 1, 0);
+			string s;
+			stringstream ss;
+			ss << buf;
+
+			ss >> s;
+
+			if (s.substr(0, 5) == "START") {
+				cout << "STARTING..." << endl;
+				CLIENT::IS_STARTED = true;
+			};
 		}
 
 #else
@@ -299,7 +315,7 @@ namespace std {
 #endif
 
 		// Do-while loop to send and recieve data
-		char buf[4096];
+		char buf[4096] = "";
 		std::string userInput;
 
 #ifdef _WIN32
@@ -321,6 +337,15 @@ namespace std {
 					{
 						// Echo response to console
 						std::cout << "SERVER> " << std::string(buf, 0, bytesReceived) << '\n';
+					}
+					string s;
+					stringstream ss;
+					ss << buf;
+
+					ss >> s;
+					if (s.substr(0, 5) == "START") {
+						cout << "STARTING..." << endl;
+						SERVER::IS_STARTED = true;
 					}
 				}
 			}

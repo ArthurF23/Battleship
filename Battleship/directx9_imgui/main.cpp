@@ -132,7 +132,7 @@ struct SUBMARINE_ {
 struct PATROL_BOAT_ {
     string name = "Patrol Boat";
     bool destroyed = false;
-    bool holes_hit[3] = { false, false, false };
+    bool holes_hit[2] = { false, false };
     int POS_X = 0;
     int POS_Y = 0;
 };
@@ -152,13 +152,67 @@ public:
     PATROL_BOAT_* PATROL_BOAT = new PATROL_BOAT_;
 };
 
-class PLAYER {
+
+struct RADAR_ {
+    string ID;
+    ImVec2 SIZE = ImVec2(50, 50);
+    enum STATE {
+        UNCLICKED,
+        MISS,
+        HIT
+    };
+};
+
+class PLAYER {    
 public:
     atomic<bool> LOST = false;
+
+    atomic<bool> is_turn = false;
 
     string name = "Player";
 
     SHIPS_CLASS* SHIPS = new SHIPS_CLASS;
+
+    RADAR_* RADAR[120];
+
+    void GENERATE_RADAR() {
+        string LETTERS[10] = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" };
+        for (int i = 0, u = 0, L = -1; i != 121; i++) {
+            RADAR[i] = new RADAR_;
+            string ID;
+            if (i == 0) {
+                ID = "INV";
+            }
+
+            else if (u == 0) {
+                ID = LETTERS[L];
+            }
+
+            else if (L == -1) {
+                ID = to_string(u);
+            }
+
+            else {             
+                if (L != -1)
+                    ID = LETTERS[L] + "-" + to_string(u);                              
+            };
+
+            
+
+            RADAR[i]->ID = ID;
+
+            if (u == 10) {
+                u = 0;
+                L++;
+            }
+
+            else {
+                u++;
+            }            
+            cout << RADAR[i]->ID << endl;
+        };
+        
+    }
     
 };
 
@@ -204,7 +258,6 @@ void launch_comms(bool host_client) {
     };
 }
 
-
 // Main code
 int main(int, char**)
 {
@@ -212,6 +265,7 @@ int main(int, char**)
     th.join();
 
     PLAYER_1 = new PLAYER;
+    PLAYER_1->is_turn = true;
     PLAYER_2 = new PLAYER;
     if (is_host == true) {
         POINTER = PLAYER_1;
@@ -254,7 +308,7 @@ int main(int, char**)
         } while (CLIENT::CONNECTED_TO_SERVER == false);
     }
     cout << "Connected!" << endl << "Starting..." << endl;;
-
+    POINTER->GENERATE_RADAR();
 
     // Create application window
     //ImGui_ImplWin32_EnableDpiAwareness();
@@ -309,6 +363,7 @@ int main(int, char**)
     bool show_save_window = false;
     bool show_game_window = false;
     bool show_config_window = true;
+    bool placed_ships = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     
 
@@ -363,1316 +418,88 @@ int main(int, char**)
         */
 
         // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-        if (show_demo_window)
+        if (show_demo_window == false)
             ImGui::ShowDemoWindow(&show_demo_window);
 
         //Player's arrangement
-        if (show_game_window == true && show_config_window == false) {
+        if (show_game_window == true && show_config_window == false && SERVER::IS_STARTED == true && CLIENT::IS_STARTED == true) {
             static float f = 0.0f;
             static int counter = 0;
             ImGui::SetNextWindowPos(ImVec2(PLAYER_VIEW().X, PLAYER_VIEW().Y));
             ImGui::SetNextWindowSize(ImVec2(PLAYER_VIEW().WIDTH, PLAYER_VIEW().HEIGHT));
 
-            ImGui::Begin((POINTER->name + "'s ships").c_str(), (bool*)false, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);                          // Create a window called "Hello, world!" and append into it.
+            ImGui::Begin((POINTER->name + "'s fleet").c_str(), (bool*)false, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);                          // Create a window called "Hello, world!" and append into it.
             ImGui::Columns(11, NULL, false);
-            string name;
-            /*for (int i = 0; i < 121; i++) {
-                if (i > 0) {
-                    name = to_string(i).c_str();
-                }
-                ImGui::Button(name.c_str(), ImVec2(50, 50));
-                ImGui::NextColumn();
-            }*/
-            if (ImGui::InvisibleButton("", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("1", BUTTON_SIZE)) {
-                cout << "Click" << endl;
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("2", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("3", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("4", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("5", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("6", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("7", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("8", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("9", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("10", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();    
-
-            //$$$$$$$$$$$$$$$$$$$$$$$$$$$//
-
-            if (ImGui::Button("A", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("A-1", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("A-2", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("A-3", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("A-4", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("A-5", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("A-6", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("A-7", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("A-8", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("A-9", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("A-10", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            //$$$$$$$$$$$$$$$$$$$$$$$$$$$//
-
-            if (ImGui::Button("B", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("B-1", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("B-2", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("B-3", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("B-4", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("B-5", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("B-6", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("B-7", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("B-8", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("B-9", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("B-10", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            //$$$$$$$$$$$$$$$$$$$$$$$$$$$//
-
-            if (ImGui::Button("C", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("C-1", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("C-2", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("C-3", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("C-4", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("C-5", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("C-6", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("C-7", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("C-8", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("C-9", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("C-10", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            //$$$$$$$$$$$$$$$$$$$$$$$$$$$//
-
-            if (ImGui::Button("D", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("D-1", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("D-2", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("D-3", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("D-4", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("D-5", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("D-6", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("D-7", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("D-8", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("D-9", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("D-10", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            //$$$$$$$$$$$$$$$$$$$$$$$$$$$//
-
-            if (ImGui::Button("E", BUTTON_SIZE)) {
-
-            };        
-            ImGui::NextColumn();
-
-            if (ImGui::Button("E-1", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("E-2", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("E-3", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("E-4", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("E-5", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("E-6", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("E-7", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("E-8", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("E-9", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("E-10", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            //$$$$$$$$$$$$$$$$$$$$$$$$$$$//
-
-            if (ImGui::Button("F", BUTTON_SIZE)) {
-
-            };            
-            ImGui::NextColumn();
-
-            if (ImGui::Button("F-1", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("F-2", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("F-3", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("F-4", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("F-5", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("F-6", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("F-7", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("F-8", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("F-9", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("F-10", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            //$$$$$$$$$$$$$$$$$$$$$$$$$$$//
-
-            if (ImGui::Button("G", BUTTON_SIZE)) {
-
-            };       
-            ImGui::NextColumn();
-
-            if (ImGui::Button("G-1", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("G-2", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("G-3", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("G-4", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("G-5", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("G-6", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("G-7", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("G-8", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("G-9", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("G-10", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            //$$$$$$$$$$$$$$$$$$$$$$$$$$$//
-
-            if (ImGui::Button("H", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("H-1", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("H-2", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("H-3", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("H-4", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("H-5", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("H-6", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("H-7", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("H-8", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("H-9", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("H-10", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            //$$$$$$$$$$$$$$$$$$$$$$$$$$$//
-
-            if (ImGui::Button("I", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("I-1", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("I-2", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("I-3", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("I-4", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("I-5", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("I-6", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("I-7", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("I-8", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("I-9", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("I-10", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            //$$$$$$$$$$$$$$$$$$$$$$$$$$$//
-
-            if (ImGui::Button("J", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("J-1", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("J-2", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("J-3", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("J-4", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("J-5", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("J-6", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("J-7", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("J-8", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("J-9", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            if (ImGui::Button("J-10", BUTTON_SIZE)) {
-
-            };
-            ImGui::NextColumn();
-
-            //$$$$$$$$$$$$$$$$$$$$$$$$$$$//       
+            
 
             ImGui::End();
         }
 
 
         //Radar
-        if (show_game_window == true && show_config_window == false) {
+        if (show_game_window == true && show_config_window == false && SERVER::IS_STARTED == true && CLIENT::IS_STARTED == true) {
         ImGui::SetNextWindowPos(ImVec2(PLAYER_RADAR().X, PLAYER_RADAR().Y));
         ImGui::SetNextWindowSize(ImVec2(PLAYER_RADAR().WIDTH, PLAYER_RADAR().HEIGHT));
 
         ImGui::Begin("Radar", (bool*)false, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);                          // Create a window called "Hello, world!" and append into it.
         ImGui::Columns(11, NULL, false);
+
         string name;
-        /*for (int i = 0; i < 121; i++) {
-            if (i > 0) {
-                name = to_string(i).c_str();
+        for (int i = 0; i != 121; i++) {
+            name = POINTER->RADAR[i]->ID;
+            if (name == "INV") {
+                ImGui::InvisibleButton(" ", POINTER->RADAR[i]->SIZE);
             }
-            ImGui::Button(name.c_str(), ImVec2(50, 50));
+
+            else {
+                if (ImGui::Button(name.c_str(), POINTER->RADAR[i]->SIZE)) {
+                    if (POINTER->is_turn == true) {                        
+                        cout << POINTER->RADAR[i]->ID << endl;
+                    }                    
+                };
+            }
             ImGui::NextColumn();
-        }*/
-        if (ImGui::InvisibleButton("", BUTTON_SIZE)) {
-
         };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("1", BUTTON_SIZE)) {
-            cout << "Click" << endl;
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("2", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("3", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("4", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("5", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("6", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("7", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("8", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("9", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("10", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        //$$$$$$$$$$$$$$$$$$$$$$$$$$$//
-
-        if (ImGui::Button("A", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("A-1", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("A-2", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("A-3", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("A-4", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("A-5", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("A-6", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("A-7", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("A-8", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("A-9", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("A-10", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        //$$$$$$$$$$$$$$$$$$$$$$$$$$$//
-
-        if (ImGui::Button("B", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("B-1", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("B-2", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("B-3", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("B-4", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("B-5", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("B-6", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("B-7", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("B-8", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("B-9", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("B-10", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        //$$$$$$$$$$$$$$$$$$$$$$$$$$$//
-
-        if (ImGui::Button("C", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("C-1", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("C-2", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("C-3", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("C-4", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("C-5", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("C-6", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("C-7", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("C-8", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("C-9", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("C-10", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        //$$$$$$$$$$$$$$$$$$$$$$$$$$$//
-
-        if (ImGui::Button("D", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("D-1", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("D-2", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("D-3", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("D-4", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("D-5", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("D-6", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("D-7", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("D-8", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("D-9", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("D-10", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        //$$$$$$$$$$$$$$$$$$$$$$$$$$$//
-
-        if (ImGui::Button("E", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("E-1", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("E-2", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("E-3", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("E-4", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("E-5", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("E-6", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("E-7", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("E-8", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("E-9", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("E-10", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        //$$$$$$$$$$$$$$$$$$$$$$$$$$$//
-
-        if (ImGui::Button("F", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("F-1", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("F-2", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("F-3", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("F-4", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("F-5", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("F-6", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("F-7", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("F-8", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("F-9", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("F-10", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        //$$$$$$$$$$$$$$$$$$$$$$$$$$$//
-
-        if (ImGui::Button("G", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("G-1", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("G-2", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("G-3", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("G-4", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("G-5", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("G-6", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("G-7", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("G-8", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("G-9", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("G-10", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        //$$$$$$$$$$$$$$$$$$$$$$$$$$$//
-
-        if (ImGui::Button("H", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("H-1", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("H-2", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("H-3", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("H-4", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("H-5", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("H-6", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("H-7", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("H-8", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("H-9", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("H-10", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        //$$$$$$$$$$$$$$$$$$$$$$$$$$$//
-
-        if (ImGui::Button("I", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("I-1", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("I-2", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("I-3", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("I-4", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("I-5", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("I-6", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("I-7", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("I-8", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("I-9", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("I-10", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        //$$$$$$$$$$$$$$$$$$$$$$$$$$$//
-
-        if (ImGui::Button("J", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("J-1", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("J-2", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("J-3", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("J-4", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("J-5", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("J-6", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("J-7", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("J-8", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("J-9", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        if (ImGui::Button("J-10", BUTTON_SIZE)) {
-
-        };
-        ImGui::NextColumn();
-
-        //$$$$$$$$$$$$$$$$$$$$$$$$$$$//       
 
         ImGui::End();
 
         }
 
+        //Waiting window
+        if (show_game_window == true && show_config_window == false && (SERVER::IS_STARTED == false || CLIENT::IS_STARTED == false)) {
+            ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x / 2, (ImGui::GetIO().DisplaySize.y / 2) - 100));
+            ImGui::SetNextWindowSize(ImVec2(400, 100));
+
+            ImGui::Begin("Waiting...", (bool*)false, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+
+            ImGui::Text("Waiting for other player to start...");
+            ImGui::End();
+        }
+
+        //Config window
         if (show_config_window) {
-            ImGui::Begin("Config");
-            ImGui::Text(POINTER->name.c_str());
-            if (ImGui::Button("Start?")) {
-                if (is_host == true) {
-                    SERVER::SEND("START");
-                }
-                else if (is_host == false) {
-                    CLIENT::SEND("START");
-                }
-                show_game_window = true;
-                show_config_window = false;
-            };            
+            ImGui::SetNextWindowPos(ImVec2(PLAYER_VIEW().X, PLAYER_VIEW().Y));
+            ImGui::SetNextWindowSize(ImVec2(PLAYER_VIEW().WIDTH, PLAYER_VIEW().HEIGHT));
+            ImGui::Begin("Config");            
+            if (placed_ships == true) {
+                ImGui::Text((POINTER->name + "'s ships").c_str());
+
+            }
+
+            else if (placed_ships == false) {
+                if (ImGui::Button("Start?")) {
+                    if (is_host == true) {
+                        SERVER::SEND("START");
+                        SERVER::IS_STARTED = true;
+                    }
+                    else if (is_host == false) {
+                        CLIENT::SEND("START");
+                        CLIENT::IS_STARTED = true;
+                    }
+                    show_game_window = true;
+                    show_config_window = false;
+                };
+            };
             ImGui::End();
         }
 
