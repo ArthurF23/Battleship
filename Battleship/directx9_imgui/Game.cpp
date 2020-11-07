@@ -27,6 +27,7 @@ namespace std {
 
 	bool CLIENT::IS_STARTED = false;
 
+	string SERVER::RECENTMESSAGE = "";
 
 	bool SERVER::CONNECTED_TO_CLIENT = false;
 
@@ -197,7 +198,7 @@ namespace std {
 			ss << buf;
 
 			ss >> s;
-
+			SERVER::RECENTMESSAGE = s;
 			if (s.substr(0, 5) == "START") {
 				cout << "STARTING..." << endl;
 				CLIENT::IS_STARTED = true;

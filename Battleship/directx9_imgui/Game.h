@@ -12,6 +12,8 @@ namespace std {
 		static bool CONNECTED_TO_CLIENT;
 
 		static bool IS_STARTED;
+
+		static string RECENTMESSAGE;
 	};
 
 	class CLIENT {

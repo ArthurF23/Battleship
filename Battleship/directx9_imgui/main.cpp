@@ -27,6 +27,7 @@ using namespace std;
 #include <tchar.h>
 
 static string IP;
+static bool is_host = false;
 /*
 10x10 grid
 
@@ -87,18 +88,17 @@ struct PLAYER_RADAR {
     int Y = 0;
 };
 
-struct STYLE {
-    ImVec4 color_main = ImVec4(255.0f, 0.0f, 0.0f, 1.0f);
-    ImVec4 color_active = ImVec4(1.255f, 0.30f, 0.30f, 1.0f);
-    ImVec4 color_slider = ImVec4(0.400f, 0.0f, 0.0f, 1.0f);
-    ImVec4 color_background = ImVec4(0.300f, 0.0f, 0.0f, 1.0f);
-    ImGuiStyle& style_ptr = ImGui::GetStyle();
+struct COLOR {
+    ImVec4 HIT = ImVec4(255.0f, 0.0f, 0.0f, 1.0f);
+    ImVec4 MISS = ImVec4(0.255f, 0.255f, 0.255f, 1.0f);
+    ImVec4 DEFAULT = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
 };
 
 ImVec2 BUTTON_SIZE = ImVec2(50, 50);
 
 struct CARRIER_ {
     string name = "Carrier";
+    string location[5];
     bool destroyed = false;
     bool holes_hit[5] = { false, false, false, false, false };
     int POS_X = 0;
@@ -107,6 +107,7 @@ struct CARRIER_ {
 
 struct BATTLESHIP_ {
     string name = "Battleship";
+    string location[4];
     bool destroyed = false;
     bool holes_hit[4] = { false, false, false, false };
     int POS_X = 0;
@@ -115,6 +116,7 @@ struct BATTLESHIP_ {
 
 struct DESTROYER_ {
     string name = "Destroyer";
+    string location[3];
     bool destroyed = false;
     bool holes_hit[3] = { false, false, false };
     int POS_X = 0;
@@ -123,6 +125,7 @@ struct DESTROYER_ {
 
 struct SUBMARINE_ {
     string name = "Submarine";
+    string location[3];
     bool destroyed = false;
     bool holes_hit[3] = { false, false, false };
     int POS_X = 0;
@@ -131,6 +134,7 @@ struct SUBMARINE_ {
 
 struct PATROL_BOAT_ {
     string name = "Patrol Boat";
+    string location[2];
     bool destroyed = false;
     bool holes_hit[2] = { false, false };
     int POS_X = 0;
@@ -156,11 +160,13 @@ public:
 struct RADAR_ {
     string ID;
     ImVec2 SIZE = ImVec2(50, 50);
-    enum STATE {
+    enum STATE_ {
         UNCLICKED,
         MISS,
         HIT
     };
+
+    STATE_ STATE = UNCLICKED;
 };
 
 class PLAYER {    
@@ -174,6 +180,29 @@ public:
     SHIPS_CLASS* SHIPS = new SHIPS_CLASS;
 
     RADAR_* RADAR[120];
+
+    void BUTTON_FUNC(string BTN, int arrL) {
+        if (is_host == true) {
+            thread sendth(SERVER::SEND, ("F@" + to_string(arrL)));
+            sendth.join();
+            cout << SERVER::RECENTMESSAGE << endl;
+            Sleep(31000);
+            if (SERVER::RECENTMESSAGE.substr(0, 5) == "F@HIT") {
+                int index = stoi(SERVER::RECENTMESSAGE.substr(5, SERVER::RECENTMESSAGE.length()));
+                RADAR[index]->STATE = RADAR[index]->STATE_::HIT;
+                RADAR[index]->ID += "\nHIT";
+                SERVER::RECENTMESSAGE = "";
+            }
+
+            else if (SERVER::RECENTMESSAGE == "F@MISS") {
+                int index = stoi(SERVER::RECENTMESSAGE.substr(5, SERVER::RECENTMESSAGE.length()));
+                RADAR[index]->STATE = RADAR[index]->STATE_::MISS;
+                RADAR[index]->ID += "\nMISS";
+                SERVER::RECENTMESSAGE = "";
+            }
+        }
+        
+    }
 
     void GENERATE_RADAR() {
         string LETTERS[10] = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" };
@@ -219,8 +248,6 @@ public:
 PLAYER* PLAYER_1;
 PLAYER* PLAYER_2;
 PLAYER* POINTER;
-
-static bool is_host = false;
 
 int setup() {
     cout << "Are you hosting a game or joining a game? h (host) / j (join)" << endl;
@@ -452,10 +479,42 @@ int main(int, char**)
             }
 
             else {
-                if (ImGui::Button(name.c_str(), POINTER->RADAR[i]->SIZE)) {
-                    if (POINTER->is_turn == true) {                        
-                        cout << POINTER->RADAR[i]->ID << endl;
-                    }                    
+                if (POINTER->RADAR[i]->STATE == POINTER->RADAR[i]->STATE_::HIT) {
+                    ImGui::PushStyleColor(ImGuiCol_Button, COLOR().HIT);
+                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, COLOR().HIT);
+                    ImGui::PushStyleColor(ImGuiCol_ButtonActive, COLOR().HIT);
+
+                    if (ImGui::Button(name.c_str(), POINTER->RADAR[i]->SIZE)) {
+                        if (POINTER->is_turn == true) {
+                            POINTER->BUTTON_FUNC(POINTER->RADAR[i]->ID, i);
+                        }
+                    };
+                    ImGui::PopStyleColor();
+                }
+
+                else if (POINTER->RADAR[i]->STATE == POINTER->RADAR[i]->STATE_::MISS) {
+                    ImGui::PushStyleColor(ImGuiCol_Button, COLOR().MISS);
+                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, COLOR().MISS);
+                    ImGui::PushStyleColor(ImGuiCol_ButtonActive, COLOR().MISS);
+
+                    if (ImGui::Button(name.c_str(), POINTER->RADAR[i]->SIZE)) {
+                        if (POINTER->is_turn == true) {
+                            POINTER->BUTTON_FUNC(POINTER->RADAR[i]->ID, i);
+                        }
+                    };
+                    ImGui::PopStyleColor();
+                }
+
+                else {
+                    ImGui::PushStyleColor(ImGuiCol_Button, COLOR().DEFAULT);
+                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, COLOR().DEFAULT);
+                    ImGui::PushStyleColor(ImGuiCol_ButtonActive, COLOR().DEFAULT);
+                    if (ImGui::Button(name.c_str(), POINTER->RADAR[i]->SIZE)) {
+                        if (POINTER->is_turn == true) {
+                            POINTER->BUTTON_FUNC(POINTER->RADAR[i]->ID, i);
+                        }
+                    };
+                    ImGui::PopStyleColor();
                 };
             }
             ImGui::NextColumn();
@@ -481,12 +540,14 @@ int main(int, char**)
             ImGui::SetNextWindowPos(ImVec2(PLAYER_VIEW().X, PLAYER_VIEW().Y));
             ImGui::SetNextWindowSize(ImVec2(PLAYER_VIEW().WIDTH, PLAYER_VIEW().HEIGHT));
             ImGui::Begin("Config");            
-            if (placed_ships == true) {
+            if (placed_ships == false) {
                 ImGui::Text((POINTER->name + "'s ships").c_str());
-
+                if (ImGui::Button("Done?")) {
+                    placed_ships = true;
+                };
             }
 
-            else if (placed_ships == false) {
+            else if (placed_ships == true) {
                 if (ImGui::Button("Start?")) {
                     if (is_host == true) {
                         SERVER::SEND("START");
