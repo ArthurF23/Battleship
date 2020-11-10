@@ -29,7 +29,30 @@ using namespace std;
 static string IP;
 static bool is_host = false;
 /*
-10x10 grid
+10x10 grid (technically 11x11)
+What the array looks like as the buttons mapped
+
+    0   1   2   3   4   5   6   7   8   9   10
+
+    11  12  13  14  15  16  17  18  19  20  21
+
+    22  23  24  25  26  27  28  29  30  31  32
+
+    33  34  35  36  37  38  39  40  41  42  43
+
+    44  45  46  47  48  49  50  51  52  53  54
+
+    55  56  57  58  59  60  61  62  63  64  65
+
+    66  67  68  69  70  71  72  73  74  75  76
+
+    77  78  79  80  81  82  83  84  85  86  87
+
+    88  89  90  91  92  93  94  95  96  97  98
+
+    99  100 101 102 103 104 105 106 107 108 109
+
+    110 111 112 113 114 115 116 117 118 119 120
 
 5 ships
 
@@ -91,60 +114,249 @@ struct PLAYER_RADAR {
 struct COLOR {
     ImVec4 HIT = ImVec4(255.0f, 0.0f, 0.0f, 1.0f);
     ImVec4 MISS = ImVec4(0.255f, 0.255f, 0.255f, 1.0f);
+    ImVec4 SUNK = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+    ImVec4 BOAT = ImVec4(0.040f, 0.050f, 0.160f, 1.0f);
     ImVec4 DEFAULT = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
 };
 
 ImVec2 BUTTON_SIZE = ImVec2(50, 50);
 
+struct PLACER_ {
+    int LENGTH;
+    int MAX_ARR_SIZE = 120;
+
+    int FORBIDDEN_BUTTONS[21] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+    11, 22, 33, 44, 55, 66, 77, 88, 99, 110 }; // Buttons that arent supposed to be clicked
+
+    PLACER_(int LENGTH_) {
+        LENGTH = LENGTH_;        
+    };
+
+    enum ROTATION_ {
+        HORIZONTAL,
+        VERTICAL
+    };    
+
+    ROTATION_ ROTATION = ROTATION_::HORIZONTAL;
+    int ROTATION_MATH[2] = {1, 11}; //+1=Horizontal, +11=Vertical
+    
+    string SMART_PLACER_POS[5];
+
+    bool SMART_PLACER(int LOCATION) {
+
+        if (LENGTH == 5) {
+
+            if (ROTATION == ROTATION_::HORIZONTAL && (LOCATION + 4) <= 120 && (LOCATION + 3) <= 120 && (LOCATION + 2) <= 120 && (LOCATION + 1) <= 120 &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[0] && LOCATION + 11 != FORBIDDEN_BUTTONS[1] && LOCATION + 11 != FORBIDDEN_BUTTONS[2] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[3] && LOCATION + 11 != FORBIDDEN_BUTTONS[4] && LOCATION + 11 != FORBIDDEN_BUTTONS[5] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[6] && LOCATION + 11 != FORBIDDEN_BUTTONS[7] && LOCATION + 11 != FORBIDDEN_BUTTONS[8] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[9] && LOCATION + 11 != FORBIDDEN_BUTTONS[10] && LOCATION + 11 != FORBIDDEN_BUTTONS[11] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[12] && LOCATION + 11 != FORBIDDEN_BUTTONS[13] && LOCATION + 11 != FORBIDDEN_BUTTONS[14] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[15] && LOCATION + 11 != FORBIDDEN_BUTTONS[16] && LOCATION + 11 != FORBIDDEN_BUTTONS[17] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[18] && LOCATION + 11 != FORBIDDEN_BUTTONS[19] && LOCATION + 11 != FORBIDDEN_BUTTONS[20]) {
+                SMART_PLACER_POS[0] = to_string(LOCATION);
+                SMART_PLACER_POS[1] = to_string(LOCATION + 1);
+                SMART_PLACER_POS[2] = to_string(LOCATION + 2);
+                SMART_PLACER_POS[3] = to_string(LOCATION + 3);
+                SMART_PLACER_POS[4] = to_string(LOCATION + 4);
+                return true;
+            }
+
+            else if (ROTATION == ROTATION_::VERTICAL && (LOCATION + 11) <= 120 && (LOCATION + 22) <= 120 && (LOCATION + 33) <= 120 && (LOCATION + 44) <= 120 &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[0] && LOCATION + 11 != FORBIDDEN_BUTTONS[1] && LOCATION + 11 != FORBIDDEN_BUTTONS[2] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[3] && LOCATION + 11 != FORBIDDEN_BUTTONS[4] && LOCATION + 11 != FORBIDDEN_BUTTONS[5] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[6] && LOCATION + 11 != FORBIDDEN_BUTTONS[7] && LOCATION + 11 != FORBIDDEN_BUTTONS[8] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[9] && LOCATION + 11 != FORBIDDEN_BUTTONS[10] && LOCATION + 11 != FORBIDDEN_BUTTONS[11] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[12] && LOCATION + 11 != FORBIDDEN_BUTTONS[13] && LOCATION + 11 != FORBIDDEN_BUTTONS[14] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[15] && LOCATION + 11 != FORBIDDEN_BUTTONS[16] && LOCATION + 11 != FORBIDDEN_BUTTONS[17] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[18] && LOCATION + 11 != FORBIDDEN_BUTTONS[19] && LOCATION + 11 != FORBIDDEN_BUTTONS[20]) {
+                SMART_PLACER_POS[0] = to_string(LOCATION);
+                SMART_PLACER_POS[1] = to_string(LOCATION + 11);
+                SMART_PLACER_POS[2] = to_string(LOCATION + 22);
+                SMART_PLACER_POS[3] = to_string(LOCATION + 33);
+                SMART_PLACER_POS[4] = to_string(LOCATION + 44);
+                return true;
+            }
+
+            else {
+                return false;
+            };
+
+        }
+
+        else if (LENGTH == 4) {
+
+            if (ROTATION == ROTATION_::HORIZONTAL && (LOCATION + 3) <= 120 && (LOCATION + 2) <= 120 && (LOCATION + 1) <= 120 &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[0] && LOCATION + 11 != FORBIDDEN_BUTTONS[1] && LOCATION + 11 != FORBIDDEN_BUTTONS[2] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[3] && LOCATION + 11 != FORBIDDEN_BUTTONS[4] && LOCATION + 11 != FORBIDDEN_BUTTONS[5] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[6] && LOCATION + 11 != FORBIDDEN_BUTTONS[7] && LOCATION + 11 != FORBIDDEN_BUTTONS[8] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[9] && LOCATION + 11 != FORBIDDEN_BUTTONS[10] && LOCATION + 11 != FORBIDDEN_BUTTONS[11] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[12] && LOCATION + 11 != FORBIDDEN_BUTTONS[13] && LOCATION + 11 != FORBIDDEN_BUTTONS[14] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[15] && LOCATION + 11 != FORBIDDEN_BUTTONS[16] && LOCATION + 11 != FORBIDDEN_BUTTONS[17] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[18] && LOCATION + 11 != FORBIDDEN_BUTTONS[19] && LOCATION + 11 != FORBIDDEN_BUTTONS[20]) {
+                SMART_PLACER_POS[0] = to_string(LOCATION);
+                SMART_PLACER_POS[1] = to_string(LOCATION + 1);
+                SMART_PLACER_POS[2] = to_string(LOCATION + 2);
+                SMART_PLACER_POS[3] = to_string(LOCATION + 3);
+                SMART_PLACER_POS[4] = to_string(LOCATION + 4);
+                return true;
+            }
+
+            else if (ROTATION == ROTATION_::VERTICAL && (LOCATION + 11) <= 120 && (LOCATION + 22) <= 120 && (LOCATION + 33) <= 120 &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[0] && LOCATION + 11 != FORBIDDEN_BUTTONS[1] && LOCATION + 11 != FORBIDDEN_BUTTONS[2] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[3] && LOCATION + 11 != FORBIDDEN_BUTTONS[4] && LOCATION + 11 != FORBIDDEN_BUTTONS[5] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[6] && LOCATION + 11 != FORBIDDEN_BUTTONS[7] && LOCATION + 11 != FORBIDDEN_BUTTONS[8] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[9] && LOCATION + 11 != FORBIDDEN_BUTTONS[10] && LOCATION + 11 != FORBIDDEN_BUTTONS[11] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[12] && LOCATION + 11 != FORBIDDEN_BUTTONS[13] && LOCATION + 11 != FORBIDDEN_BUTTONS[14] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[15] && LOCATION + 11 != FORBIDDEN_BUTTONS[16] && LOCATION + 11 != FORBIDDEN_BUTTONS[17] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[18] && LOCATION + 11 != FORBIDDEN_BUTTONS[19] && LOCATION + 11 != FORBIDDEN_BUTTONS[20]) {
+                SMART_PLACER_POS[0] = to_string(LOCATION);
+                SMART_PLACER_POS[1] = to_string(LOCATION + 11);
+                SMART_PLACER_POS[2] = to_string(LOCATION + 22);
+                SMART_PLACER_POS[3] = to_string(LOCATION + 33);
+                SMART_PLACER_POS[4] = to_string(LOCATION + 44);
+                return true;
+            }
+
+            else {
+                return false;
+            };
+        }
+
+        else if (LENGTH == 3) {
+
+            if (ROTATION == ROTATION_::HORIZONTAL && (LOCATION + 2) <= 120 && (LOCATION + 1) <= 120 &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[0] && LOCATION + 11 != FORBIDDEN_BUTTONS[1] && LOCATION + 11 != FORBIDDEN_BUTTONS[2] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[3] && LOCATION + 11 != FORBIDDEN_BUTTONS[4] && LOCATION + 11 != FORBIDDEN_BUTTONS[5] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[6] && LOCATION + 11 != FORBIDDEN_BUTTONS[7] && LOCATION + 11 != FORBIDDEN_BUTTONS[8] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[9] && LOCATION + 11 != FORBIDDEN_BUTTONS[10] && LOCATION + 11 != FORBIDDEN_BUTTONS[11] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[12] && LOCATION + 11 != FORBIDDEN_BUTTONS[13] && LOCATION + 11 != FORBIDDEN_BUTTONS[14] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[15] && LOCATION + 11 != FORBIDDEN_BUTTONS[16] && LOCATION + 11 != FORBIDDEN_BUTTONS[17] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[18] && LOCATION + 11 != FORBIDDEN_BUTTONS[19] && LOCATION + 11 != FORBIDDEN_BUTTONS[20]) {
+                SMART_PLACER_POS[0] = to_string(LOCATION);
+                SMART_PLACER_POS[1] = to_string(LOCATION + 1);
+                SMART_PLACER_POS[2] = to_string(LOCATION + 2);
+                SMART_PLACER_POS[3] = to_string(LOCATION + 3);
+                SMART_PLACER_POS[4] = to_string(LOCATION + 4);
+                return true;
+            }
+
+            else if (ROTATION == ROTATION_::VERTICAL && (LOCATION + 11) <= 120 && (LOCATION + 22) <= 120 &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[0] && LOCATION + 11 != FORBIDDEN_BUTTONS[1] && LOCATION + 11 != FORBIDDEN_BUTTONS[2] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[3] && LOCATION + 11 != FORBIDDEN_BUTTONS[4] && LOCATION + 11 != FORBIDDEN_BUTTONS[5] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[6] && LOCATION + 11 != FORBIDDEN_BUTTONS[7] && LOCATION + 11 != FORBIDDEN_BUTTONS[8] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[9] && LOCATION + 11 != FORBIDDEN_BUTTONS[10] && LOCATION + 11 != FORBIDDEN_BUTTONS[11] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[12] && LOCATION + 11 != FORBIDDEN_BUTTONS[13] && LOCATION + 11 != FORBIDDEN_BUTTONS[14] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[15] && LOCATION + 11 != FORBIDDEN_BUTTONS[16] && LOCATION + 11 != FORBIDDEN_BUTTONS[17] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[18] && LOCATION + 11 != FORBIDDEN_BUTTONS[19] && LOCATION + 11 != FORBIDDEN_BUTTONS[20]) {
+                SMART_PLACER_POS[0] = to_string(LOCATION);
+                SMART_PLACER_POS[1] = to_string(LOCATION + 11);
+                SMART_PLACER_POS[2] = to_string(LOCATION + 22);
+                SMART_PLACER_POS[3] = to_string(LOCATION + 33);
+                SMART_PLACER_POS[4] = to_string(LOCATION + 44);
+                return true;
+            }
+
+            else {
+                return false;
+            };
+        }
+
+        else if (LENGTH == 2) {
+
+            if (ROTATION == ROTATION_::HORIZONTAL && (LOCATION + 1) <= 120 &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[0] && LOCATION + 11 != FORBIDDEN_BUTTONS[1] && LOCATION + 11 != FORBIDDEN_BUTTONS[2] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[3] && LOCATION + 11 != FORBIDDEN_BUTTONS[4] && LOCATION + 11 != FORBIDDEN_BUTTONS[5] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[6] && LOCATION + 11 != FORBIDDEN_BUTTONS[7] && LOCATION + 11 != FORBIDDEN_BUTTONS[8] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[9] && LOCATION + 11 != FORBIDDEN_BUTTONS[10] && LOCATION + 11 != FORBIDDEN_BUTTONS[11] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[12] && LOCATION + 11 != FORBIDDEN_BUTTONS[13] && LOCATION + 11 != FORBIDDEN_BUTTONS[14] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[15] && LOCATION + 11 != FORBIDDEN_BUTTONS[16] && LOCATION + 11 != FORBIDDEN_BUTTONS[17] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[18] && LOCATION + 11 != FORBIDDEN_BUTTONS[19] && LOCATION + 11 != FORBIDDEN_BUTTONS[20]) {
+                SMART_PLACER_POS[0] = to_string(LOCATION);
+                SMART_PLACER_POS[1] = to_string(LOCATION + 1);
+                SMART_PLACER_POS[2] = to_string(LOCATION + 2);
+                SMART_PLACER_POS[3] = to_string(LOCATION + 3);
+                SMART_PLACER_POS[4] = to_string(LOCATION + 4);
+                return true;
+            }
+
+            else if (ROTATION == ROTATION_::VERTICAL && (LOCATION + 11) <= 120 && 
+                LOCATION + 11 != FORBIDDEN_BUTTONS[0] && LOCATION + 11 != FORBIDDEN_BUTTONS[1] && LOCATION + 11 != FORBIDDEN_BUTTONS[2] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[3] && LOCATION + 11 != FORBIDDEN_BUTTONS[4] && LOCATION + 11 != FORBIDDEN_BUTTONS[5] && 
+                LOCATION + 11 != FORBIDDEN_BUTTONS[6] && LOCATION + 11 != FORBIDDEN_BUTTONS[7] && LOCATION + 11 != FORBIDDEN_BUTTONS[8] && 
+                LOCATION + 11 != FORBIDDEN_BUTTONS[9] && LOCATION + 11 != FORBIDDEN_BUTTONS[10] && LOCATION + 11 != FORBIDDEN_BUTTONS[11] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[12] && LOCATION + 11 != FORBIDDEN_BUTTONS[13] && LOCATION + 11 != FORBIDDEN_BUTTONS[14] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[15] && LOCATION + 11 != FORBIDDEN_BUTTONS[16] && LOCATION + 11 != FORBIDDEN_BUTTONS[17] &&
+                LOCATION + 11 != FORBIDDEN_BUTTONS[18] && LOCATION + 11 != FORBIDDEN_BUTTONS[19] && LOCATION + 11 != FORBIDDEN_BUTTONS[20]) {
+                SMART_PLACER_POS[0] = to_string(LOCATION);
+                SMART_PLACER_POS[1] = to_string(LOCATION + 11);
+                SMART_PLACER_POS[2] = to_string(LOCATION + 22);
+                SMART_PLACER_POS[3] = to_string(LOCATION + 33);
+                SMART_PLACER_POS[4] = to_string(LOCATION + 44);
+                return true;
+            }
+
+            else {
+                return false;
+            };
+        }
+    };
+};
+
 struct CARRIER_ {
-    string name = "Carrier";
-    string location[5];
-    bool destroyed = false;
-    bool holes_hit[5] = { false, false, false, false, false };
-    int POS_X = 0;
-    int POS_Y = 0;
+    string NAME = "Carrier";
+    const static int LENGTH = 5;
+
+    int LOCATION[LENGTH];
+    bool IS_DESTROYED = false;
+    bool HOLES_HIT[5] = { false, false, false, false, false };
+    PLACER_* PLACER = new PLACER_(LENGTH);
 };
 
 struct BATTLESHIP_ {
-    string name = "Battleship";
-    string location[4];
-    bool destroyed = false;
-    bool holes_hit[4] = { false, false, false, false };
-    int POS_X = 0;
-    int POS_Y = 0;
+    string NAME = "Battleship";
+    const static int LENGTH = 4;
+
+    int LOCATION[LENGTH];
+    bool IS_DESTROYED = false;
+    bool HOLES_HIT[LENGTH] = { false, false, false, false };
+    PLACER_* PLACER = new PLACER_(LENGTH);
 };
 
 struct DESTROYER_ {
-    string name = "Destroyer";
-    string location[3];
-    bool destroyed = false;
-    bool holes_hit[3] = { false, false, false };
-    int POS_X = 0;
-    int POS_Y = 0;
+    string NAME = "Destroyer";
+    const static int LENGTH = 3;
+
+    int LOCATION[LENGTH];
+    bool IS_DESTROYED = false;
+    bool HOLES_HIT[LENGTH] = { false, false, false };
+    PLACER_* PLACER = new PLACER_(LENGTH);
 };
 
 struct SUBMARINE_ {
-    string name = "Submarine";
-    string location[3];
-    bool destroyed = false;
-    bool holes_hit[3] = { false, false, false };
-    int POS_X = 0;
-    int POS_Y = 0;
+    string NAME = "Submarine";
+    const static int LENGTH = 3;
+
+    int LOCATION[LENGTH];
+    bool IS_DESTROYED = false;
+    bool HOLES_HIT[LENGTH] = { false, false, false };
+    PLACER_* PLACER = new PLACER_(LENGTH);
 };
 
 struct PATROL_BOAT_ {
-    string name = "Patrol Boat";
-    string location[2];
-    bool destroyed = false;
-    bool holes_hit[2] = { false, false };
-    int POS_X = 0;
-    int POS_Y = 0;
+    string NAME = "Patrol Boat";
+    const static int LENGTH = 2;
+
+    int LOCATION[LENGTH];
+    bool IS_DESTROYED = false;
+    bool HOLES_HIT[LENGTH] = { false, false };
+    PLACER_* PLACER = new PLACER_(LENGTH);
 };
 
 
 
 class SHIPS_CLASS {
-public:
+public:    
     CARRIER_* CARRIER = new CARRIER_;
 
     BATTLESHIP_* BATTLESHIP = new BATTLESHIP_;
@@ -163,13 +375,32 @@ struct RADAR_ {
     enum STATE_ {
         UNCLICKED,
         MISS,
-        HIT
+        HIT,
+        SUNK
     };
 
-    STATE_ STATE = UNCLICKED;
+    int FORBIDDEN_BUTTONS[21] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+    11, 22, 33, 44, 55, 66, 77, 88, 99, 110}; // Buttons that arent supposed to be clicked
+
+    STATE_ STATE = STATE_::UNCLICKED;
+};
+
+struct FLEET_ {
+    string ID;
+    ImVec2 SIZE = ImVec2(50, 50);
+    enum STATE_ {
+        UNCLICKED,
+        MISS,
+        HIT,
+        BOAT
+    };
+
+    STATE_ STATE = STATE_::UNCLICKED;
 };
 
 class PLAYER {    
+private:
+    const static int RADAR_SIZE = 120;
 public:
     atomic<bool> LOST = false;
 
@@ -179,29 +410,49 @@ public:
 
     SHIPS_CLASS* SHIPS = new SHIPS_CLASS;
 
-    RADAR_* RADAR[120];
+    RADAR_* RADAR[121];
+
+    FLEET_* FLEET[120];
 
     void BUTTON_FUNC(string BTN, int arrL) {
-        if (is_host == true) {
-            thread sendth(SERVER::SEND, ("F@" + to_string(arrL)));
-            sendth.join();
-            cout << SERVER::RECENTMESSAGE << endl;
-            Sleep(31000);
-            if (SERVER::RECENTMESSAGE.substr(0, 5) == "F@HIT") {
-                int index = stoi(SERVER::RECENTMESSAGE.substr(5, SERVER::RECENTMESSAGE.length()));
-                RADAR[index]->STATE = RADAR[index]->STATE_::HIT;
-                RADAR[index]->ID += "\nHIT";
-                SERVER::RECENTMESSAGE = "";
-            }
+        bool is_forbidden = false;
+        for (int i = 0; i < 21; i++) {
+            if (arrL == RADAR[arrL]->FORBIDDEN_BUTTONS[i]) {
+                is_forbidden = true;
+                break;
+            };
+        };
 
-            else if (SERVER::RECENTMESSAGE == "F@MISS") {
-                int index = stoi(SERVER::RECENTMESSAGE.substr(5, SERVER::RECENTMESSAGE.length()));
-                RADAR[index]->STATE = RADAR[index]->STATE_::MISS;
-                RADAR[index]->ID += "\nMISS";
-                SERVER::RECENTMESSAGE = "";
+        if (is_forbidden == false && is_turn == true) {
+            if (is_host == true) {
+                thread sendth(SERVER::SEND, ("F@" + to_string(arrL)));
+                sendth.join();
+                cout << "waiting for response..." << endl;
+                do {
+                    Sleep(1000);
+                } while (SERVER::RECENTMESSAGE == "");
+                if (SERVER::RECENTMESSAGE.substr(0, 5) == "R@HIT") {
+                    int index = stoi(SERVER::RECENTMESSAGE.substr(5, SERVER::RECENTMESSAGE.length()));
+                    RADAR[index]->STATE = RADAR[index]->STATE_::HIT;
+                    RADAR[index]->ID += "\nHIT";
+                    SERVER::RECENTMESSAGE = "";
+                }
+
+                else if (SERVER::RECENTMESSAGE.substr(0, 6) == "R@MISS") {
+                    int index = stoi(SERVER::RECENTMESSAGE.substr(6, SERVER::RECENTMESSAGE.length()));
+                    RADAR[index]->STATE = RADAR[index]->STATE_::MISS;
+                    RADAR[index]->ID += "\nMISS";
+                    SERVER::RECENTMESSAGE = "";
+                }
+
+                else if (SERVER::RECENTMESSAGE.substr(0, 6) == "R@SUNK") {
+                    int index = stoi(SERVER::RECENTMESSAGE.substr(6, SERVER::RECENTMESSAGE.length()));
+                    RADAR[index]->STATE = RADAR[index]->STATE_::SUNK;
+                    RADAR[index]->ID += "\nSUNK";
+                    SERVER::RECENTMESSAGE = "";
+                }
             }
-        }
-        
+        };        
     }
 
     void GENERATE_RADAR() {
@@ -219,7 +470,7 @@ public:
 
             else if (L == -1) {
                 ID = to_string(u);
-            }
+            }            
 
             else {             
                 if (L != -1)
@@ -241,6 +492,104 @@ public:
             cout << RADAR[i]->ID << endl;
         };
         
+    }
+
+    void GENERATE_FLEET() {
+        string LETTERS[10] = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" };
+        for (int i = 0, u = 0, L = -1; i != 121; i++) {
+            FLEET[i] = new FLEET_;
+            string ID;
+            if (i == 0) {
+                ID = "INV";
+            }
+
+            else if (u == 0) {
+                ID = LETTERS[L];
+            }
+
+            else if (L == -1) {
+                ID = to_string(u);
+            }
+            //register carriers
+            else if (SHIPS->CARRIER->LOCATION[0] == i) {
+                ID = LETTERS[L] + "-" + to_string(u) + "\nCARR-";
+                FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+            }
+
+            else if (SHIPS->CARRIER->LOCATION[1] == i) {
+                ID = LETTERS[L] + "-" + to_string(u) + "\nCARR-";
+                FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+            }
+
+            else if (SHIPS->CARRIER->LOCATION[2] == i) {
+                ID = LETTERS[L] + "-" + to_string(u) + "\nCARR-";
+                FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+            }
+
+            else if (SHIPS->CARRIER->LOCATION[3] == i) {
+                ID = LETTERS[L] + "-" + to_string(u) + "\nCARR-";
+                FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+            }
+
+            else if (SHIPS->CARRIER->LOCATION[4] == i) {
+                ID = LETTERS[L] + "-" + to_string(u) + "\nCARR-";
+                FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+            }
+
+            //register battleships
+            else if (SHIPS->BATTLESHIP->LOCATION[0] == i) {
+                ID = LETTERS[L] + "-" + to_string(u) + "\nBATT-";
+                FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+            }
+
+            else if (SHIPS->BATTLESHIP->LOCATION[1] == i) {
+                ID = LETTERS[L] + "-" + to_string(u) + "\nBATT-";
+                FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+            }
+
+            else if (SHIPS->BATTLESHIP->LOCATION[2] == i) {
+                ID = LETTERS[L] + "-" + to_string(u) + "\nBATT-";
+                FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+            }
+
+            else if (SHIPS->BATTLESHIP->LOCATION[3] == i) {
+                ID = LETTERS[L] + "-" + to_string(u) + "\nBATT-";
+                FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+            }
+
+            //register patrol boats
+            else if (SHIPS->PATROL_BOAT->LOCATION[0] == i) {
+                ID = LETTERS[L] + "-" + to_string(u) + "\nPATR-";
+                FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+            }
+
+            else if (SHIPS->PATROL_BOAT->LOCATION[1] == i) {
+                ID = LETTERS[L] + "-" + to_string(u) + "\nPATR-";
+                FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+            }
+
+            else {
+                if (L != -1)
+                    ID = LETTERS[L] + "-" + to_string(u);
+            };
+
+
+
+
+
+            FLEET[i]->ID = ID;
+
+            if (u == 10) {
+                u = 0;
+                L++;
+            }
+
+            else {
+                u++;
+            }
+            cout << FLEET[i]->ID << endl;
+        };
+
     }
     
 };
@@ -392,8 +741,11 @@ int main(int, char**)
     bool show_config_window = true;
     bool placed_ships = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-    
-
+    static char INPUT[1250] = "";
+    static char INPUT_2[1250] = "";
+    static char INPUT_3[1250] = "";
+    static char INPUT_4[1250] = "";
+    static char INPUT_5[1250] = "";
     
     
 
@@ -457,7 +809,68 @@ int main(int, char**)
 
             ImGui::Begin((POINTER->name + "'s fleet").c_str(), (bool*)false, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);                          // Create a window called "Hello, world!" and append into it.
             ImGui::Columns(11, NULL, false);
-            
+
+            string name;
+            for (int i = 0; i != 121; i++) {
+                name = POINTER->FLEET[i]->ID;
+                if (name == "INV") {
+                    ImGui::InvisibleButton(" ", POINTER->FLEET[i]->SIZE);
+                }
+
+                else {
+                    if (POINTER->FLEET[i]->STATE == POINTER->FLEET[i]->STATE_::HIT) {
+                        ImGui::PushStyleColor(ImGuiCol_Button, COLOR().HIT);
+                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, COLOR().HIT);
+                        ImGui::PushStyleColor(ImGuiCol_ButtonActive, COLOR().HIT);
+
+                        if (ImGui::Button(name.c_str(), POINTER->FLEET[i]->SIZE)) {
+                            if (POINTER->is_turn == true) {
+                                POINTER->BUTTON_FUNC(POINTER->FLEET[i]->ID, i);
+                            }
+                        };
+                        ImGui::PopStyleColor();
+                    }
+
+                    else if (POINTER->FLEET[i]->STATE == POINTER->FLEET[i]->STATE_::MISS) {
+                        ImGui::PushStyleColor(ImGuiCol_Button, COLOR().MISS);
+                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, COLOR().MISS);
+                        ImGui::PushStyleColor(ImGuiCol_ButtonActive, COLOR().MISS);
+
+                        if (ImGui::Button(name.c_str(), POINTER->FLEET[i]->SIZE)) {
+                            if (POINTER->is_turn == true) {
+                                POINTER->BUTTON_FUNC(POINTER->FLEET[i]->ID, i);
+                            }
+                        };
+                        ImGui::PopStyleColor();
+                    }
+
+                    else if (POINTER->FLEET[i]->STATE == POINTER->FLEET[i]->STATE_::BOAT) {
+                        ImGui::PushStyleColor(ImGuiCol_Button, COLOR().BOAT);
+                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, COLOR().BOAT);
+                        ImGui::PushStyleColor(ImGuiCol_ButtonActive, COLOR().BOAT);
+
+                        if (ImGui::Button(name.c_str(), POINTER->FLEET[i]->SIZE)) {
+                            if (POINTER->is_turn == true) {
+                                POINTER->BUTTON_FUNC(POINTER->FLEET[i]->ID, i);
+                            }
+                        };
+                        ImGui::PopStyleColor();
+                    }
+
+                    else {
+                        ImGui::PushStyleColor(ImGuiCol_Button, COLOR().DEFAULT);
+                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, COLOR().DEFAULT);
+                        ImGui::PushStyleColor(ImGuiCol_ButtonActive, COLOR().DEFAULT);
+                        if (ImGui::Button(name.c_str(), POINTER->FLEET[i]->SIZE)) {
+                            if (POINTER->is_turn == true) {
+                                POINTER->BUTTON_FUNC(POINTER->FLEET[i]->ID, i);
+                            }
+                        };
+                        ImGui::PopStyleColor();
+                    };
+                }
+                ImGui::NextColumn();
+            };
 
             ImGui::End();
         }
@@ -475,7 +888,7 @@ int main(int, char**)
         for (int i = 0; i != 121; i++) {
             name = POINTER->RADAR[i]->ID;
             if (name == "INV") {
-                ImGui::InvisibleButton(" ", POINTER->RADAR[i]->SIZE);
+                ImGui::InvisibleButton("INV", POINTER->RADAR[i]->SIZE);
             }
 
             else {
@@ -537,13 +950,85 @@ int main(int, char**)
 
         //Config window
         if (show_config_window) {
-            ImGui::SetNextWindowPos(ImVec2(PLAYER_VIEW().X, PLAYER_VIEW().Y));
+            ImGui::SetNextWindowPos(ImVec2(PLAYER_RADAR().X, PLAYER_RADAR().Y));
             ImGui::SetNextWindowSize(ImVec2(PLAYER_VIEW().WIDTH, PLAYER_VIEW().HEIGHT));
             ImGui::Begin("Config");            
             if (placed_ships == false) {
                 ImGui::Text((POINTER->name + "'s ships").c_str());
+                ImGui::Text((POINTER->SHIPS->CARRIER->NAME).c_str());
+                ImGui::InputText("Carrier pos", INPUT, IM_ARRAYSIZE(INPUT));
+                if (ImGui::Button("Horizontal")) {
+                    POINTER->SHIPS->CARRIER->PLACER->ROTATION = POINTER->SHIPS->CARRIER->PLACER->ROTATION_::HORIZONTAL;
+                }
+
+                if (ImGui::Button("Vertical")) {
+                    POINTER->SHIPS->CARRIER->PLACER->ROTATION = POINTER->SHIPS->CARRIER->PLACER->ROTATION_::VERTICAL;
+                }
+
+                ImGui::InputText("Battleship pos", INPUT_2, IM_ARRAYSIZE(INPUT_2));
+                if (ImGui::Button("Horizontal ")) {
+                    POINTER->SHIPS->BATTLESHIP->PLACER->ROTATION = POINTER->SHIPS->BATTLESHIP->PLACER->ROTATION_::HORIZONTAL;
+                }
+
+                if (ImGui::Button("Vertical ")) {
+                    POINTER->SHIPS->BATTLESHIP->PLACER->ROTATION = POINTER->SHIPS->BATTLESHIP->PLACER->ROTATION_::VERTICAL;
+                }
+
+                ImGui::InputText("Patrol Boat pos", INPUT_5, IM_ARRAYSIZE(INPUT_5));
+                if (ImGui::Button("Horizontal  ")) {
+                    POINTER->SHIPS->PATROL_BOAT->PLACER->ROTATION = POINTER->SHIPS->PATROL_BOAT->PLACER->ROTATION_::HORIZONTAL;
+                }
+
+                if (ImGui::Button("Vertical  ")) {
+                    POINTER->SHIPS->PATROL_BOAT->PLACER->ROTATION = POINTER->SHIPS->PATROL_BOAT->PLACER->ROTATION_::VERTICAL;
+                }
+
+
+               
+
+                
+
                 if (ImGui::Button("Done?")) {
-                    placed_ships = true;
+                    
+                    if (POINTER->SHIPS->CARRIER->PLACER->SMART_PLACER(stoi(INPUT)) == true) {
+                        placed_ships = true;
+                        POINTER->SHIPS->CARRIER->LOCATION[0] = stoi(POINTER->SHIPS->CARRIER->PLACER->SMART_PLACER_POS[0]);
+                        POINTER->SHIPS->CARRIER->LOCATION[1] = stoi(POINTER->SHIPS->CARRIER->PLACER->SMART_PLACER_POS[1]);
+                        POINTER->SHIPS->CARRIER->LOCATION[2] = stoi(POINTER->SHIPS->CARRIER->PLACER->SMART_PLACER_POS[2]);
+                        POINTER->SHIPS->CARRIER->LOCATION[3] = stoi(POINTER->SHIPS->CARRIER->PLACER->SMART_PLACER_POS[3]);
+                        POINTER->SHIPS->CARRIER->LOCATION[4] = stoi(POINTER->SHIPS->CARRIER->PLACER->SMART_PLACER_POS[4]);
+                    }
+                    else {                        
+                        placed_ships = false;
+                        cout << "INVALID POSITION @ CARRIER" << endl;
+                    };                 
+
+                    if (POINTER->SHIPS->BATTLESHIP->PLACER->SMART_PLACER(stoi(INPUT_2)) == true) {
+                        placed_ships = true;
+                        POINTER->SHIPS->BATTLESHIP->LOCATION[0] = stoi(POINTER->SHIPS->BATTLESHIP->PLACER->SMART_PLACER_POS[0]);
+                        POINTER->SHIPS->BATTLESHIP->LOCATION[1] = stoi(POINTER->SHIPS->BATTLESHIP->PLACER->SMART_PLACER_POS[1]);
+                        POINTER->SHIPS->BATTLESHIP->LOCATION[2] = stoi(POINTER->SHIPS->BATTLESHIP->PLACER->SMART_PLACER_POS[2]);
+                        POINTER->SHIPS->BATTLESHIP->LOCATION[3] = stoi(POINTER->SHIPS->BATTLESHIP->PLACER->SMART_PLACER_POS[3]);
+                    }
+                    else {
+                        placed_ships = false;
+                        cout << "INVALID POSITION @ BATTLESHIP" << endl;
+                    };
+
+                    if (POINTER->SHIPS->PATROL_BOAT->PLACER->SMART_PLACER(stoi(INPUT_5)) == true) {
+                        placed_ships = true;
+                        POINTER->SHIPS->PATROL_BOAT->LOCATION[0] = stoi(POINTER->SHIPS->PATROL_BOAT->PLACER->SMART_PLACER_POS[0]);
+                        POINTER->SHIPS->PATROL_BOAT->LOCATION[1] = stoi(POINTER->SHIPS->PATROL_BOAT->PLACER->SMART_PLACER_POS[1]);
+                    }
+                    else {
+                        placed_ships = false;
+                        cout << "INVALID POSITION @ PATROL_BOAT" << endl;
+                    };
+
+                    if (placed_ships == true) {
+                        POINTER->GENERATE_FLEET();
+                    }
+                    
                 };
             }
 

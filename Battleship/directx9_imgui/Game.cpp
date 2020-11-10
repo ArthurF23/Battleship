@@ -201,6 +201,7 @@ namespace std {
 			SERVER::RECENTMESSAGE = s;
 			if (s.substr(0, 5) == "START") {
 				cout << "STARTING..." << endl;
+				SERVER::RECENTMESSAGE = "";
 				CLIENT::IS_STARTED = true;
 			};
 		}
@@ -251,6 +252,7 @@ namespace std {
 
 	int SERVER::SEND(string data) {
 		send(clientSocket, data.c_str(), data.length() + 1, 0);
+		return 0;
 	}
 
 	int CLIENT::START(string ip) {
@@ -402,5 +404,6 @@ namespace std {
 
 	int CLIENT::SEND(string data) {
 		send(sock, data.c_str(), data.length() + 1, 0);
+		return 0;
 	}
 }
