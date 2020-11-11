@@ -29,6 +29,8 @@ namespace std {
 
 	string SERVER::RECENTMESSAGE = "";
 
+	string CLIENT::RECENTMESSAGE = "";
+
 	bool SERVER::CONNECTED_TO_CLIENT = false;
 
 	bool CLIENT::CONNECTED_TO_SERVER = false;
@@ -349,6 +351,10 @@ namespace std {
 					if (s.substr(0, 5) == "START") {
 						cout << "STARTING..." << endl;
 						SERVER::IS_STARTED = true;
+					}
+
+					else if (s.substr(0, 5) == "NAME:") {
+						cout << "NAME RECIVED" << endl;
 					}
 				}
 			}

@@ -25,6 +25,8 @@ namespace std {
 		static bool CONNECTED_TO_SERVER;
 
 		static bool IS_STARTED;
+
+		static string RECENTMESSAGE;
 	};
 
 	class GAME {

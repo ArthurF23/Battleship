@@ -20,7 +20,6 @@ using namespace std;
 #include "imgui_impl_dx9.h"
 #include "imgui_impl_win32.h"
 #include <d3d9.h>
-#include "Converter_table.h"
 #pragma comment (lib, "d3d9.lib") //Adds some thing that make d3d9.h work
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
@@ -366,6 +365,8 @@ public:
     SUBMARINE_* SUBMARINE = new SUBMARINE_;
 
     PATROL_BOAT_* PATROL_BOAT = new PATROL_BOAT_;
+
+    bool VALID_POS[5] = { false, false, false, false, false };
 };
 
 
@@ -423,7 +424,7 @@ public:
             };
         };
 
-        if (is_forbidden == false && is_turn == true) {
+        if (is_forbidden == false && is_turn == true && RADAR[arrL]->STATE == RADAR[arrL]->STATE_::UNCLICKED) {
             if (is_host == true) {
                 thread sendth(SERVER::SEND, ("F@" + to_string(arrL)));
                 sendth.join();
@@ -457,6 +458,7 @@ public:
 
     void GENERATE_RADAR() {
         string LETTERS[10] = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" };
+        cout << "Generating Radar" << endl;
         for (int i = 0, u = 0, L = -1; i != 121; i++) {
             RADAR[i] = new RADAR_;
             string ID;
@@ -496,6 +498,7 @@ public:
 
     void GENERATE_FLEET() {
         string LETTERS[10] = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" };
+        cout << "Generating Fleet..." << endl;
         for (int i = 0, u = 0, L = -1; i != 121; i++) {
             FLEET[i] = new FLEET_;
             string ID;
@@ -557,6 +560,38 @@ public:
                 FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
             }
 
+            //register Destroyers
+            else if (SHIPS->DESTROYER->LOCATION[0] == i) {
+                ID = LETTERS[L] + "-" + to_string(u) + "\nDEST-";
+                FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+            }
+
+            else if (SHIPS->DESTROYER->LOCATION[1] == i) {
+                ID = LETTERS[L] + "-" + to_string(u) + "\nDEST-";
+                FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+            }
+
+            else if (SHIPS->DESTROYER->LOCATION[2] == i) {
+                ID = LETTERS[L] + "-" + to_string(u) + "\nDEST-";
+                FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+            }
+
+            //register Submarines
+            else if (SHIPS->SUBMARINE->LOCATION[0] == i) {
+                ID = LETTERS[L] + "-" + to_string(u) + "\nSUB-";
+                FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+            }
+
+            else if (SHIPS->SUBMARINE->LOCATION[1] == i) {
+                ID = LETTERS[L] + "-" + to_string(u) + "\nSUB-";
+                FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+            }
+
+            else if (SHIPS->SUBMARINE->LOCATION[2] == i) {
+                ID = LETTERS[L] + "-" + to_string(u) + "\nSUB-";
+                FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+            }
+
             //register patrol boats
             else if (SHIPS->PATROL_BOAT->LOCATION[0] == i) {
                 ID = LETTERS[L] + "-" + to_string(u) + "\nPATR-";
@@ -597,6 +632,7 @@ public:
 PLAYER* PLAYER_1;
 PLAYER* PLAYER_2;
 PLAYER* POINTER;
+PLAYER* ENEMY_POINTER;
 
 int setup() {
     cout << "Are you hosting a game or joining a game? h (host) / j (join)" << endl;
@@ -612,7 +648,7 @@ int setup() {
     }
     else if (inp == 'h') {
         system("cls");
-        cout << "Starting..." << endl;
+        cout << "Setting up..." << endl;
         is_host = true;
         return 0;
     }
@@ -634,24 +670,53 @@ void launch_comms(bool host_client) {
     };
 }
 
+void get_name() {
+    if (is_host == true) {
+        SERVER::SEND("NAME:" + POINTER->name);
+        do {
+            Sleep(1000);
+        } while (SERVER::RECENTMESSAGE == "");
+
+        PLAYER_2->name = SERVER::RECENTMESSAGE.substr(5, SERVER::RECENTMESSAGE.length());
+        SERVER::RECENTMESSAGE = "";
+        cout << "Player 2 name: " << PLAYER_2->name << endl;
+    }
+    else {
+        CLIENT::SEND("NAME:" + POINTER->name);
+        do {
+            Sleep(1000);
+        } while (CLIENT::RECENTMESSAGE == "");
+
+        PLAYER_2->name = CLIENT::RECENTMESSAGE.substr(5, CLIENT::RECENTMESSAGE.length());
+        CLIENT::RECENTMESSAGE = "";
+        cout << "Player 1 name: " << PLAYER_2->name << endl;
+    };
+}
+
 // Main code
 int main(int, char**)
 {
+
     thread th(setup);
     th.join();
 
     PLAYER_1 = new PLAYER;
     PLAYER_1->is_turn = true;
     PLAYER_2 = new PLAYER;
+
     if (is_host == true) {
         POINTER = PLAYER_1;
+        ENEMY_POINTER = PLAYER_2;
     }
     else if (is_host == false) {
         POINTER = PLAYER_2;
+        ENEMY_POINTER = PLAYER_1;
     };
+
     cout << "Please enter a name" << endl;
     string name_inp;
     cin >> name_inp;
+
     POINTER->name = name_inp;
 
     thread comms(launch_comms, is_host);
@@ -683,7 +748,10 @@ int main(int, char**)
             system("cls");
         } while (CLIENT::CONNECTED_TO_SERVER == false);
     }
-    cout << "Connected!" << endl << "Starting..." << endl;;
+    cout << "Connected!" << endl << "Starting..." << endl;
+    cout << "Getting other player's name..." << endl;
+    thread NAME_TH(get_name);
+    NAME_TH.join();
     POINTER->GENERATE_RADAR();
 
     // Create application window
@@ -741,11 +809,8 @@ int main(int, char**)
     bool show_config_window = true;
     bool placed_ships = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-    static char INPUT[1250] = "";
-    static char INPUT_2[1250] = "";
-    static char INPUT_3[1250] = "";
-    static char INPUT_4[1250] = "";
-    static char INPUT_5[1250] = "";
+    static char INPUT[5][1250] = { {"12"}, {"23"}, {"34"}, {"45"}, {"56"} };
+    
     
     
 
@@ -800,7 +865,7 @@ int main(int, char**)
         if (show_demo_window == false)
             ImGui::ShowDemoWindow(&show_demo_window);
 
-        //Player's arrangement
+        //Player's fleet show_game_window == true && show_config_window == false && 
         if (show_game_window == true && show_config_window == false && SERVER::IS_STARTED == true && CLIENT::IS_STARTED == true) {
             static float f = 0.0f;
             static int counter = 0;
@@ -871,7 +936,6 @@ int main(int, char**)
                 }
                 ImGui::NextColumn();
             };
-
             ImGui::End();
         }
 
@@ -943,8 +1007,8 @@ int main(int, char**)
             ImGui::SetNextWindowSize(ImVec2(400, 100));
 
             ImGui::Begin("Waiting...", (bool*)false, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-
-            ImGui::Text("Waiting for other player to start...");
+            string waiting = "Waiting for " + ENEMY_POINTER->name + " to start...";
+            ImGui::Text(waiting.c_str());
             ImGui::End();
         }
 
@@ -956,7 +1020,7 @@ int main(int, char**)
             if (placed_ships == false) {
                 ImGui::Text((POINTER->name + "'s ships").c_str());
                 ImGui::Text((POINTER->SHIPS->CARRIER->NAME).c_str());
-                ImGui::InputText("Carrier pos", INPUT, IM_ARRAYSIZE(INPUT));
+                ImGui::InputText("Carrier pos", INPUT[0], IM_ARRAYSIZE(INPUT[0]));
                 if (ImGui::Button("Horizontal")) {
                     POINTER->SHIPS->CARRIER->PLACER->ROTATION = POINTER->SHIPS->CARRIER->PLACER->ROTATION_::HORIZONTAL;
                 }
@@ -964,8 +1028,8 @@ int main(int, char**)
                 if (ImGui::Button("Vertical")) {
                     POINTER->SHIPS->CARRIER->PLACER->ROTATION = POINTER->SHIPS->CARRIER->PLACER->ROTATION_::VERTICAL;
                 }
-
-                ImGui::InputText("Battleship pos", INPUT_2, IM_ARRAYSIZE(INPUT_2));
+                //##############################
+                ImGui::InputText("Battleship pos", INPUT[1], IM_ARRAYSIZE(INPUT[1]));
                 if (ImGui::Button("Horizontal ")) {
                     POINTER->SHIPS->BATTLESHIP->PLACER->ROTATION = POINTER->SHIPS->BATTLESHIP->PLACER->ROTATION_::HORIZONTAL;
                 }
@@ -973,25 +1037,40 @@ int main(int, char**)
                 if (ImGui::Button("Vertical ")) {
                     POINTER->SHIPS->BATTLESHIP->PLACER->ROTATION = POINTER->SHIPS->BATTLESHIP->PLACER->ROTATION_::VERTICAL;
                 }
-
-                ImGui::InputText("Patrol Boat pos", INPUT_5, IM_ARRAYSIZE(INPUT_5));
+                //##############################
+                ImGui::InputText("Destroyer pos", INPUT[2], IM_ARRAYSIZE(INPUT[2]));
                 if (ImGui::Button("Horizontal  ")) {
-                    POINTER->SHIPS->PATROL_BOAT->PLACER->ROTATION = POINTER->SHIPS->PATROL_BOAT->PLACER->ROTATION_::HORIZONTAL;
+                    POINTER->SHIPS->DESTROYER->PLACER->ROTATION = POINTER->SHIPS->DESTROYER->PLACER->ROTATION_::HORIZONTAL;
                 }
 
                 if (ImGui::Button("Vertical  ")) {
-                    POINTER->SHIPS->PATROL_BOAT->PLACER->ROTATION = POINTER->SHIPS->PATROL_BOAT->PLACER->ROTATION_::VERTICAL;
+                    POINTER->SHIPS->DESTROYER->PLACER->ROTATION = POINTER->SHIPS->DESTROYER->PLACER->ROTATION_::VERTICAL;
+                }
+                //##############################
+                ImGui::InputText("Submarine pos", INPUT[3], IM_ARRAYSIZE(INPUT[3]));
+                if (ImGui::Button("Horizontal   ")) {
+                    POINTER->SHIPS->SUBMARINE->PLACER->ROTATION = POINTER->SHIPS->SUBMARINE->PLACER->ROTATION_::HORIZONTAL;
                 }
 
+                if (ImGui::Button("Vertical   ")) {
+                    POINTER->SHIPS->SUBMARINE->PLACER->ROTATION = POINTER->SHIPS->SUBMARINE->PLACER->ROTATION_::VERTICAL;
+                }
+                //##############################
+                ImGui::InputText("Patrol Boat pos", INPUT[4], IM_ARRAYSIZE(INPUT[4]));
+                if (ImGui::Button("Horizontal    ")) {
+                    POINTER->SHIPS->PATROL_BOAT->PLACER->ROTATION = POINTER->SHIPS->PATROL_BOAT->PLACER->ROTATION_::HORIZONTAL;
+                }
 
-               
-
+                if (ImGui::Button("Vertical    ")) {
+                    POINTER->SHIPS->PATROL_BOAT->PLACER->ROTATION = POINTER->SHIPS->PATROL_BOAT->PLACER->ROTATION_::VERTICAL;
+                }
+                
                 
 
                 if (ImGui::Button("Done?")) {
                     
-                    if (POINTER->SHIPS->CARRIER->PLACER->SMART_PLACER(stoi(INPUT)) == true) {
-                        placed_ships = true;
+                    if (POINTER->SHIPS->CARRIER->PLACER->SMART_PLACER(stoi(INPUT[0])) == true) {
+                        POINTER->SHIPS->VALID_POS[0] = true;
                         POINTER->SHIPS->CARRIER->LOCATION[0] = stoi(POINTER->SHIPS->CARRIER->PLACER->SMART_PLACER_POS[0]);
                         POINTER->SHIPS->CARRIER->LOCATION[1] = stoi(POINTER->SHIPS->CARRIER->PLACER->SMART_PLACER_POS[1]);
                         POINTER->SHIPS->CARRIER->LOCATION[2] = stoi(POINTER->SHIPS->CARRIER->PLACER->SMART_PLACER_POS[2]);
@@ -999,33 +1078,57 @@ int main(int, char**)
                         POINTER->SHIPS->CARRIER->LOCATION[4] = stoi(POINTER->SHIPS->CARRIER->PLACER->SMART_PLACER_POS[4]);
                     }
                     else {                        
-                        placed_ships = false;
+                        POINTER->SHIPS->VALID_POS[0] = false;
                         cout << "INVALID POSITION @ CARRIER" << endl;
                     };                 
-
-                    if (POINTER->SHIPS->BATTLESHIP->PLACER->SMART_PLACER(stoi(INPUT_2)) == true) {
-                        placed_ships = true;
+                    //#####################
+                    if (POINTER->SHIPS->BATTLESHIP->PLACER->SMART_PLACER(stoi(INPUT[1])) == true) {
+                        POINTER->SHIPS->VALID_POS[1] = true;
                         POINTER->SHIPS->BATTLESHIP->LOCATION[0] = stoi(POINTER->SHIPS->BATTLESHIP->PLACER->SMART_PLACER_POS[0]);
                         POINTER->SHIPS->BATTLESHIP->LOCATION[1] = stoi(POINTER->SHIPS->BATTLESHIP->PLACER->SMART_PLACER_POS[1]);
                         POINTER->SHIPS->BATTLESHIP->LOCATION[2] = stoi(POINTER->SHIPS->BATTLESHIP->PLACER->SMART_PLACER_POS[2]);
                         POINTER->SHIPS->BATTLESHIP->LOCATION[3] = stoi(POINTER->SHIPS->BATTLESHIP->PLACER->SMART_PLACER_POS[3]);
                     }
                     else {
-                        placed_ships = false;
+                        POINTER->SHIPS->VALID_POS[1] = false;
                         cout << "INVALID POSITION @ BATTLESHIP" << endl;
                     };
-
-                    if (POINTER->SHIPS->PATROL_BOAT->PLACER->SMART_PLACER(stoi(INPUT_5)) == true) {
-                        placed_ships = true;
+                    //#####################
+                    if (POINTER->SHIPS->DESTROYER->PLACER->SMART_PLACER(stoi(INPUT[2])) == true) {
+                        POINTER->SHIPS->VALID_POS[2] = true;
+                        POINTER->SHIPS->DESTROYER->LOCATION[0] = stoi(POINTER->SHIPS->DESTROYER->PLACER->SMART_PLACER_POS[0]);
+                        POINTER->SHIPS->DESTROYER->LOCATION[1] = stoi(POINTER->SHIPS->DESTROYER->PLACER->SMART_PLACER_POS[1]);
+                        POINTER->SHIPS->DESTROYER->LOCATION[2] = stoi(POINTER->SHIPS->DESTROYER->PLACER->SMART_PLACER_POS[2]);
+                    }
+                    else {
+                        POINTER->SHIPS->VALID_POS[2] = false;
+                        cout << "INVALID POSITION @ DESTROYER" << endl;
+                    };
+                    //#####################
+                    if (POINTER->SHIPS->SUBMARINE->PLACER->SMART_PLACER(stoi(INPUT[3])) == true) {
+                        POINTER->SHIPS->VALID_POS[3] = true;
+                        POINTER->SHIPS->SUBMARINE->LOCATION[0] = stoi(POINTER->SHIPS->SUBMARINE->PLACER->SMART_PLACER_POS[0]);
+                        POINTER->SHIPS->SUBMARINE->LOCATION[1] = stoi(POINTER->SHIPS->SUBMARINE->PLACER->SMART_PLACER_POS[1]);
+                        POINTER->SHIPS->SUBMARINE->LOCATION[2] = stoi(POINTER->SHIPS->SUBMARINE->PLACER->SMART_PLACER_POS[2]);
+                    }
+                    else {
+                        POINTER->SHIPS->VALID_POS[3] = false;
+                        cout << "INVALID POSITION @ SUBMARINE" << endl;
+                    };
+                    //#####################
+                    if (POINTER->SHIPS->PATROL_BOAT->PLACER->SMART_PLACER(stoi(INPUT[4])) == true) {
+                        POINTER->SHIPS->VALID_POS[4] = true;
                         POINTER->SHIPS->PATROL_BOAT->LOCATION[0] = stoi(POINTER->SHIPS->PATROL_BOAT->PLACER->SMART_PLACER_POS[0]);
                         POINTER->SHIPS->PATROL_BOAT->LOCATION[1] = stoi(POINTER->SHIPS->PATROL_BOAT->PLACER->SMART_PLACER_POS[1]);
                     }
                     else {
-                        placed_ships = false;
+                        POINTER->SHIPS->VALID_POS[4] = false;
                         cout << "INVALID POSITION @ PATROL_BOAT" << endl;
                     };
-
-                    if (placed_ships == true) {
+                    //#####################
+                    if (POINTER->SHIPS->VALID_POS[0] == true && POINTER->SHIPS->VALID_POS[1] == true &&
+                        POINTER->SHIPS->VALID_POS[2] == true && POINTER->SHIPS->VALID_POS[3] == true && POINTER->SHIPS->VALID_POS[4] == true) {
+                        placed_ships = true;
                         POINTER->GENERATE_FLEET();
                     }
                     
