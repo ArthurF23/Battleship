@@ -5,21 +5,23 @@ C:\Users\apple\Documents\Code\C++\Battleship\directx9_imgui\main.cpp(96,47): war
 C:\Users\apple\Documents\Code\C++\Battleship\directx9_imgui\main.cpp(99,42): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
 C:\Users\apple\Documents\Code\C++\Battleship\directx9_imgui\main.cpp(105,46): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
 C:\Users\apple\Documents\Code\C++\Battleship\directx9_imgui\main.cpp(106,47): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-C:\Users\apple\Documents\Code\C++\Battleship\directx9_imgui\main.cpp(873,74): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\apple\Documents\Code\C++\Battleship\directx9_imgui\main.cpp(873,57): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\apple\Documents\Code\C++\Battleship\directx9_imgui\main.cpp(874,79): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\apple\Documents\Code\C++\Battleship\directx9_imgui\main.cpp(874,58): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\apple\Documents\Code\C++\Battleship\directx9_imgui\main.cpp(946,72): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\apple\Documents\Code\C++\Battleship\directx9_imgui\main.cpp(946,54): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\apple\Documents\Code\C++\Battleship\directx9_imgui\main.cpp(947,77): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\apple\Documents\Code\C++\Battleship\directx9_imgui\main.cpp(947,55): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\apple\Documents\Code\C++\Battleship\directx9_imgui\main.cpp(1018,76): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\apple\Documents\Code\C++\Battleship\directx9_imgui\main.cpp(1018,58): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\apple\Documents\Code\C++\Battleship\directx9_imgui\main.cpp(1019,79): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\apple\Documents\Code\C++\Battleship\directx9_imgui\main.cpp(1019,58): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\apple\Documents\Code\C++\Battleship\directx9_imgui\main.cpp(775,39): warning C4018: '<': signed/unsigned mismatch
+C:\Users\apple\Documents\Code\C++\Battleship\directx9_imgui\main.cpp(774,25): warning C4101: 'locations': unreferenced local variable
+C:\Users\apple\Documents\Code\C++\Battleship\directx9_imgui\main.cpp(1270,74): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\apple\Documents\Code\C++\Battleship\directx9_imgui\main.cpp(1270,57): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\apple\Documents\Code\C++\Battleship\directx9_imgui\main.cpp(1271,79): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\apple\Documents\Code\C++\Battleship\directx9_imgui\main.cpp(1271,58): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\apple\Documents\Code\C++\Battleship\directx9_imgui\main.cpp(1356,72): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\apple\Documents\Code\C++\Battleship\directx9_imgui\main.cpp(1356,54): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\apple\Documents\Code\C++\Battleship\directx9_imgui\main.cpp(1357,77): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\apple\Documents\Code\C++\Battleship\directx9_imgui\main.cpp(1357,55): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\apple\Documents\Code\C++\Battleship\directx9_imgui\main.cpp(1454,76): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\apple\Documents\Code\C++\Battleship\directx9_imgui\main.cpp(1454,58): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\apple\Documents\Code\C++\Battleship\directx9_imgui\main.cpp(1455,79): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\apple\Documents\Code\C++\Battleship\directx9_imgui\main.cpp(1455,58): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
   Generating code
-  1 of 2054 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+  1 of 2101 functions (<0.1%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    58 functions had inline decision re-evaluated but remain unchanged
+    69 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   directx9_imgui.vcxproj -> C:\Users\apple\Documents\Code\C++\Battleship\Release\Battleship.exe

@@ -113,8 +113,8 @@ struct PLAYER_RADAR {
 struct COLOR {
     ImVec4 HIT = ImVec4(255.0f, 0.0f, 0.0f, 1.0f);
     ImVec4 MISS = ImVec4(0.255f, 0.255f, 0.255f, 1.0f);
-    ImVec4 SUNK = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
-    ImVec4 BOAT = ImVec4(0.040f, 0.050f, 0.160f, 1.0f);
+    ImVec4 SUNK = ImVec4(0.053f, 0.053f, 0.105f, 1.0f);
+    ImVec4 BOAT = ImVec4(0.040f, 0.050f, 0.169f, 1.0f);
     ImVec4 DEFAULT = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
 };
 
@@ -141,164 +141,309 @@ struct PLACER_ {
     
     string SMART_PLACER_POS[5];
 
-    bool SMART_PLACER(int LOCATION) {
-
-        if (LENGTH == 5) {
-
-            if (ROTATION == ROTATION_::HORIZONTAL && (LOCATION + 4) <= 120 && (LOCATION + 3) <= 120 && (LOCATION + 2) <= 120 && (LOCATION + 1) <= 120 &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[0] && LOCATION + 11 != FORBIDDEN_BUTTONS[1] && LOCATION + 11 != FORBIDDEN_BUTTONS[2] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[3] && LOCATION + 11 != FORBIDDEN_BUTTONS[4] && LOCATION + 11 != FORBIDDEN_BUTTONS[5] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[6] && LOCATION + 11 != FORBIDDEN_BUTTONS[7] && LOCATION + 11 != FORBIDDEN_BUTTONS[8] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[9] && LOCATION + 11 != FORBIDDEN_BUTTONS[10] && LOCATION + 11 != FORBIDDEN_BUTTONS[11] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[12] && LOCATION + 11 != FORBIDDEN_BUTTONS[13] && LOCATION + 11 != FORBIDDEN_BUTTONS[14] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[15] && LOCATION + 11 != FORBIDDEN_BUTTONS[16] && LOCATION + 11 != FORBIDDEN_BUTTONS[17] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[18] && LOCATION + 11 != FORBIDDEN_BUTTONS[19] && LOCATION + 11 != FORBIDDEN_BUTTONS[20]) {
-                SMART_PLACER_POS[0] = to_string(LOCATION);
-                SMART_PLACER_POS[1] = to_string(LOCATION + 1);
-                SMART_PLACER_POS[2] = to_string(LOCATION + 2);
-                SMART_PLACER_POS[3] = to_string(LOCATION + 3);
-                SMART_PLACER_POS[4] = to_string(LOCATION + 4);
-                return true;
+    bool OVERLAP_FORBIDDEN_DETECT(int LOCATION, int INCREMENT_1, int INCREMENT_2, int INCREMENT_3, int INCREMENT_4, int LENGTH_) {
+        bool BAD_POS = false;
+        
+        for (int i = 0; i < 21; i++) {
+            if (LOCATION + INCREMENT_1 == FORBIDDEN_BUTTONS[i]) {
+                BAD_POS = true;
+                break;
             }
 
-            else if (ROTATION == ROTATION_::VERTICAL && (LOCATION + 11) <= 120 && (LOCATION + 22) <= 120 && (LOCATION + 33) <= 120 && (LOCATION + 44) <= 120 &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[0] && LOCATION + 11 != FORBIDDEN_BUTTONS[1] && LOCATION + 11 != FORBIDDEN_BUTTONS[2] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[3] && LOCATION + 11 != FORBIDDEN_BUTTONS[4] && LOCATION + 11 != FORBIDDEN_BUTTONS[5] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[6] && LOCATION + 11 != FORBIDDEN_BUTTONS[7] && LOCATION + 11 != FORBIDDEN_BUTTONS[8] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[9] && LOCATION + 11 != FORBIDDEN_BUTTONS[10] && LOCATION + 11 != FORBIDDEN_BUTTONS[11] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[12] && LOCATION + 11 != FORBIDDEN_BUTTONS[13] && LOCATION + 11 != FORBIDDEN_BUTTONS[14] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[15] && LOCATION + 11 != FORBIDDEN_BUTTONS[16] && LOCATION + 11 != FORBIDDEN_BUTTONS[17] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[18] && LOCATION + 11 != FORBIDDEN_BUTTONS[19] && LOCATION + 11 != FORBIDDEN_BUTTONS[20]) {
-                SMART_PLACER_POS[0] = to_string(LOCATION);
-                SMART_PLACER_POS[1] = to_string(LOCATION + 11);
-                SMART_PLACER_POS[2] = to_string(LOCATION + 22);
-                SMART_PLACER_POS[3] = to_string(LOCATION + 33);
-                SMART_PLACER_POS[4] = to_string(LOCATION + 44);
-                return true;
+            else if (LOCATION + INCREMENT_2 == FORBIDDEN_BUTTONS[i] && LENGTH_ >= 3) {
+                BAD_POS = true;
+                break;
             }
 
-            else {
-                return false;
-            };
-
-        }
-
-        else if (LENGTH == 4) {
-
-            if (ROTATION == ROTATION_::HORIZONTAL && (LOCATION + 3) <= 120 && (LOCATION + 2) <= 120 && (LOCATION + 1) <= 120 &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[0] && LOCATION + 11 != FORBIDDEN_BUTTONS[1] && LOCATION + 11 != FORBIDDEN_BUTTONS[2] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[3] && LOCATION + 11 != FORBIDDEN_BUTTONS[4] && LOCATION + 11 != FORBIDDEN_BUTTONS[5] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[6] && LOCATION + 11 != FORBIDDEN_BUTTONS[7] && LOCATION + 11 != FORBIDDEN_BUTTONS[8] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[9] && LOCATION + 11 != FORBIDDEN_BUTTONS[10] && LOCATION + 11 != FORBIDDEN_BUTTONS[11] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[12] && LOCATION + 11 != FORBIDDEN_BUTTONS[13] && LOCATION + 11 != FORBIDDEN_BUTTONS[14] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[15] && LOCATION + 11 != FORBIDDEN_BUTTONS[16] && LOCATION + 11 != FORBIDDEN_BUTTONS[17] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[18] && LOCATION + 11 != FORBIDDEN_BUTTONS[19] && LOCATION + 11 != FORBIDDEN_BUTTONS[20]) {
-                SMART_PLACER_POS[0] = to_string(LOCATION);
-                SMART_PLACER_POS[1] = to_string(LOCATION + 1);
-                SMART_PLACER_POS[2] = to_string(LOCATION + 2);
-                SMART_PLACER_POS[3] = to_string(LOCATION + 3);
-                SMART_PLACER_POS[4] = to_string(LOCATION + 4);
-                return true;
+            else if (LOCATION + INCREMENT_3 == FORBIDDEN_BUTTONS[i] && LENGTH_ >= 4) {
+                BAD_POS = true;
+                break;
             }
 
-            else if (ROTATION == ROTATION_::VERTICAL && (LOCATION + 11) <= 120 && (LOCATION + 22) <= 120 && (LOCATION + 33) <= 120 &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[0] && LOCATION + 11 != FORBIDDEN_BUTTONS[1] && LOCATION + 11 != FORBIDDEN_BUTTONS[2] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[3] && LOCATION + 11 != FORBIDDEN_BUTTONS[4] && LOCATION + 11 != FORBIDDEN_BUTTONS[5] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[6] && LOCATION + 11 != FORBIDDEN_BUTTONS[7] && LOCATION + 11 != FORBIDDEN_BUTTONS[8] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[9] && LOCATION + 11 != FORBIDDEN_BUTTONS[10] && LOCATION + 11 != FORBIDDEN_BUTTONS[11] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[12] && LOCATION + 11 != FORBIDDEN_BUTTONS[13] && LOCATION + 11 != FORBIDDEN_BUTTONS[14] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[15] && LOCATION + 11 != FORBIDDEN_BUTTONS[16] && LOCATION + 11 != FORBIDDEN_BUTTONS[17] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[18] && LOCATION + 11 != FORBIDDEN_BUTTONS[19] && LOCATION + 11 != FORBIDDEN_BUTTONS[20]) {
-                SMART_PLACER_POS[0] = to_string(LOCATION);
-                SMART_PLACER_POS[1] = to_string(LOCATION + 11);
-                SMART_PLACER_POS[2] = to_string(LOCATION + 22);
-                SMART_PLACER_POS[3] = to_string(LOCATION + 33);
-                SMART_PLACER_POS[4] = to_string(LOCATION + 44);
-                return true;
+            else if (LOCATION + INCREMENT_4 == FORBIDDEN_BUTTONS[i] && LENGTH_ == 5) {
+                BAD_POS = true;
+                break;
             }
 
-            else {
-                return false;
-            };
-        }
-
-        else if (LENGTH == 3) {
-
-            if (ROTATION == ROTATION_::HORIZONTAL && (LOCATION + 2) <= 120 && (LOCATION + 1) <= 120 &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[0] && LOCATION + 11 != FORBIDDEN_BUTTONS[1] && LOCATION + 11 != FORBIDDEN_BUTTONS[2] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[3] && LOCATION + 11 != FORBIDDEN_BUTTONS[4] && LOCATION + 11 != FORBIDDEN_BUTTONS[5] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[6] && LOCATION + 11 != FORBIDDEN_BUTTONS[7] && LOCATION + 11 != FORBIDDEN_BUTTONS[8] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[9] && LOCATION + 11 != FORBIDDEN_BUTTONS[10] && LOCATION + 11 != FORBIDDEN_BUTTONS[11] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[12] && LOCATION + 11 != FORBIDDEN_BUTTONS[13] && LOCATION + 11 != FORBIDDEN_BUTTONS[14] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[15] && LOCATION + 11 != FORBIDDEN_BUTTONS[16] && LOCATION + 11 != FORBIDDEN_BUTTONS[17] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[18] && LOCATION + 11 != FORBIDDEN_BUTTONS[19] && LOCATION + 11 != FORBIDDEN_BUTTONS[20]) {
-                SMART_PLACER_POS[0] = to_string(LOCATION);
-                SMART_PLACER_POS[1] = to_string(LOCATION + 1);
-                SMART_PLACER_POS[2] = to_string(LOCATION + 2);
-                SMART_PLACER_POS[3] = to_string(LOCATION + 3);
-                SMART_PLACER_POS[4] = to_string(LOCATION + 4);
-                return true;
+            else if (LOCATION + INCREMENT_1 > 120) {
+                BAD_POS = true;
+                break;
             }
 
-            else if (ROTATION == ROTATION_::VERTICAL && (LOCATION + 11) <= 120 && (LOCATION + 22) <= 120 &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[0] && LOCATION + 11 != FORBIDDEN_BUTTONS[1] && LOCATION + 11 != FORBIDDEN_BUTTONS[2] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[3] && LOCATION + 11 != FORBIDDEN_BUTTONS[4] && LOCATION + 11 != FORBIDDEN_BUTTONS[5] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[6] && LOCATION + 11 != FORBIDDEN_BUTTONS[7] && LOCATION + 11 != FORBIDDEN_BUTTONS[8] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[9] && LOCATION + 11 != FORBIDDEN_BUTTONS[10] && LOCATION + 11 != FORBIDDEN_BUTTONS[11] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[12] && LOCATION + 11 != FORBIDDEN_BUTTONS[13] && LOCATION + 11 != FORBIDDEN_BUTTONS[14] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[15] && LOCATION + 11 != FORBIDDEN_BUTTONS[16] && LOCATION + 11 != FORBIDDEN_BUTTONS[17] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[18] && LOCATION + 11 != FORBIDDEN_BUTTONS[19] && LOCATION + 11 != FORBIDDEN_BUTTONS[20]) {
-                SMART_PLACER_POS[0] = to_string(LOCATION);
-                SMART_PLACER_POS[1] = to_string(LOCATION + 11);
-                SMART_PLACER_POS[2] = to_string(LOCATION + 22);
-                SMART_PLACER_POS[3] = to_string(LOCATION + 33);
-                SMART_PLACER_POS[4] = to_string(LOCATION + 44);
-                return true;
+            else if (LOCATION + INCREMENT_2 > 120 && LENGTH_ >= 3) {
+                BAD_POS = true;
+                break;
             }
 
-            else {
-                return false;
+            else if (LOCATION + INCREMENT_3 > 120 && LENGTH_ >= 4) {
+                BAD_POS = true;
+                break;
+            }
+
+            else if (LOCATION + INCREMENT_4 > 120 && LENGTH_ == 5) {
+                BAD_POS = true;
+                break;
+            }
+        };       
+
+        return BAD_POS;
+    }
+
+    bool COLLISION_DETECTION(int LOCATION, int INCREMENT, int LENGTH_,
+        int CARRIER_POS[5], int BATTLESHIP_POS[4], int DESTROYER_POS[3], int SUBMARINE_POS[3], int PATROL_BOAT_POS[2], string SHIP_NAME) {
+        //This is to check to make sure that the ships are not overlapping
+        /*I can use almost LENGTH_ to figure out what ship it is... but the destroyer and submarine have the same length so i may have to add something
+        to determine what boat im dealing with if needed*/
+        cout << SHIP_NAME << " INCREMENT = " << INCREMENT << endl;
+        bool COLLISION = false;
+
+
+        if (SHIP_NAME == "Carrier") {
+            cout << SHIP_NAME << endl;
+
+            for (int i = 0, inc = 0; i < 5; i++, inc += INCREMENT) {
+
+                cout << LOCATION + inc << endl;
+                for (int a = 0; a < 4; a++) {
+                    if (LOCATION + inc == BATTLESHIP_POS[a]) {
+                        cout << "CARRIER INTERSECTS BATTLESHIP" << endl;
+                        COLLISION = true;
+                        break;
+                    };
+                };
+
+                for (int b = 0; b < 3; b++) {
+                    if (LOCATION + inc == DESTROYER_POS[b]) {
+                        cout << "CARRIER INTERSECTS DESTROYER" << endl;
+                        COLLISION = true;
+                    }
+                    else if (LOCATION + inc == SUBMARINE_POS[b]) {
+                        cout << "CARRIER INTERSECTS SUBMARINE" << endl;
+                        COLLISION = true;
+                        break;
+                    };
+                };
+
+                for (int c = 0; c < 2; c++) {
+                    if (LOCATION + inc == PATROL_BOAT_POS[c]) {
+                        cout << "CARRIER INTERSECTS PATROL BOAT" << endl;
+                        COLLISION = true;
+                        break;
+                    };
+                };
+
+                if (COLLISION == true) {
+                    break;
+                };
+
             };
         }
 
-        else if (LENGTH == 2) {
+        if (SHIP_NAME == "Battleship") {
+            cout << SHIP_NAME << endl;
+            for (int i = 0, inc = 0; i < 4; i++, inc += INCREMENT) {
+                for (int a = 0; a < 5; a++) {
 
-            if (ROTATION == ROTATION_::HORIZONTAL && (LOCATION + 1) <= 120 &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[0] && LOCATION + 11 != FORBIDDEN_BUTTONS[1] && LOCATION + 11 != FORBIDDEN_BUTTONS[2] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[3] && LOCATION + 11 != FORBIDDEN_BUTTONS[4] && LOCATION + 11 != FORBIDDEN_BUTTONS[5] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[6] && LOCATION + 11 != FORBIDDEN_BUTTONS[7] && LOCATION + 11 != FORBIDDEN_BUTTONS[8] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[9] && LOCATION + 11 != FORBIDDEN_BUTTONS[10] && LOCATION + 11 != FORBIDDEN_BUTTONS[11] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[12] && LOCATION + 11 != FORBIDDEN_BUTTONS[13] && LOCATION + 11 != FORBIDDEN_BUTTONS[14] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[15] && LOCATION + 11 != FORBIDDEN_BUTTONS[16] && LOCATION + 11 != FORBIDDEN_BUTTONS[17] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[18] && LOCATION + 11 != FORBIDDEN_BUTTONS[19] && LOCATION + 11 != FORBIDDEN_BUTTONS[20]) {
-                SMART_PLACER_POS[0] = to_string(LOCATION);
-                SMART_PLACER_POS[1] = to_string(LOCATION + 1);
-                SMART_PLACER_POS[2] = to_string(LOCATION + 2);
-                SMART_PLACER_POS[3] = to_string(LOCATION + 3);
-                SMART_PLACER_POS[4] = to_string(LOCATION + 4);
-                return true;
+                    cout << LOCATION + inc << endl;
+
+                    if (LOCATION + inc == CARRIER_POS[a]) {
+                        cout << SHIP_NAME << " INTERSECTS CARRIER" << endl;
+                        COLLISION = true;
+                        break;
+                    }
+                }
+                
+
+                for (int a = 0; a < 3; a++) {
+                    if (LOCATION + inc == DESTROYER_POS[a]) {
+                        cout << SHIP_NAME << " INTERSECTS DESTROYER" << endl;
+                        COLLISION = true;
+                        break;
+                    }
+                    else if (LOCATION + inc == SUBMARINE_POS[a]) {
+                        cout << SHIP_NAME << " INTERSECTS SUBMARINE" << endl;
+                        COLLISION = true;
+                        break;
+                    }
+                }
+
+                for (int a = 0; a < 2; a++) {
+                    if (LOCATION + inc == PATROL_BOAT_POS[a]) {
+                        cout << SHIP_NAME << " INTERSECTS PATROL BOAT" << endl;
+                        COLLISION = true;
+                        break;
+                    }
+                }
+
+                if (COLLISION == true) {
+                    break;
+                }
             }
 
-            else if (ROTATION == ROTATION_::VERTICAL && (LOCATION + 11) <= 120 && 
-                LOCATION + 11 != FORBIDDEN_BUTTONS[0] && LOCATION + 11 != FORBIDDEN_BUTTONS[1] && LOCATION + 11 != FORBIDDEN_BUTTONS[2] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[3] && LOCATION + 11 != FORBIDDEN_BUTTONS[4] && LOCATION + 11 != FORBIDDEN_BUTTONS[5] && 
-                LOCATION + 11 != FORBIDDEN_BUTTONS[6] && LOCATION + 11 != FORBIDDEN_BUTTONS[7] && LOCATION + 11 != FORBIDDEN_BUTTONS[8] && 
-                LOCATION + 11 != FORBIDDEN_BUTTONS[9] && LOCATION + 11 != FORBIDDEN_BUTTONS[10] && LOCATION + 11 != FORBIDDEN_BUTTONS[11] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[12] && LOCATION + 11 != FORBIDDEN_BUTTONS[13] && LOCATION + 11 != FORBIDDEN_BUTTONS[14] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[15] && LOCATION + 11 != FORBIDDEN_BUTTONS[16] && LOCATION + 11 != FORBIDDEN_BUTTONS[17] &&
-                LOCATION + 11 != FORBIDDEN_BUTTONS[18] && LOCATION + 11 != FORBIDDEN_BUTTONS[19] && LOCATION + 11 != FORBIDDEN_BUTTONS[20]) {
-                SMART_PLACER_POS[0] = to_string(LOCATION);
-                SMART_PLACER_POS[1] = to_string(LOCATION + 11);
-                SMART_PLACER_POS[2] = to_string(LOCATION + 22);
-                SMART_PLACER_POS[3] = to_string(LOCATION + 33);
-                SMART_PLACER_POS[4] = to_string(LOCATION + 44);
-                return true;
-            }
-
-            else {
-                return false;
-            };
         }
+
+        if (SHIP_NAME == "Destroyer") {
+            cout << SHIP_NAME << endl;
+            for (int i = 0, inc = 0; i < 3; i++, inc += INCREMENT) {
+                for (int a = 0; a < 5; a++) {
+
+                    cout << LOCATION + inc << endl;
+
+                    if (LOCATION + inc == CARRIER_POS[a]) {
+                        cout << SHIP_NAME << " INTERSECTS CARRIER" << endl;
+                        COLLISION = true;
+                        break;
+                    }                   
+                }
+
+                for (int a = 0; a < 4; a++) {
+                    if (LOCATION + inc == BATTLESHIP_POS[a]) {
+                        cout << SHIP_NAME << " INTERSECTS BATTLESHIP" << endl;
+                        COLLISION = true;
+                        break;
+                    };
+                };
+
+                for (int a = 0; a < 3; a++) {                    
+                    if (LOCATION + inc == SUBMARINE_POS[a]) {
+                        cout << SHIP_NAME << " INTERSECTS SUBMARINE" << endl;
+                        COLLISION = true;
+                        break;
+                    }
+                }
+
+                for (int a = 0; a < 2; a++) {
+                    if (LOCATION + inc == PATROL_BOAT_POS[a]) {
+                        cout << SHIP_NAME << " INTERSECTS PATROL BOAT" << endl;
+                        COLLISION = true;
+                        break;
+                    }
+                }
+
+                if (COLLISION == true) {
+                    break;
+                }
+            }
+
+        }
+
+        if (SHIP_NAME == "Submarine") {
+            cout << SHIP_NAME << endl;
+            for (int i = 0, inc = 0; i < 3; i++, inc += INCREMENT) {
+                for (int a = 0; a < 5; a++) {
+
+                    cout << LOCATION + inc << endl;
+
+                    if (LOCATION + inc == CARRIER_POS[a]) {
+                        cout << SHIP_NAME << " INTERSECTS CARRIER" << endl;
+                        COLLISION = true;
+                        break;
+                    }
+                }
+
+                for (int a = 0; a < 4; a++) {
+                    if (LOCATION + inc == BATTLESHIP_POS[a]) {
+                        cout << SHIP_NAME << " INTERSECTS BATTLESHIP" << endl;
+                        COLLISION = true;
+                        break;
+                    };
+                };
+
+                for (int a = 0; a < 3; a++) {
+                    if (LOCATION + inc == DESTROYER_POS[a]) {
+                        cout << SHIP_NAME << " INTERSECTS DESTROYER" << endl;
+                        COLLISION = true;
+                        break;
+                    }
+                }
+
+                for (int a = 0; a < 2; a++) {
+                    if (LOCATION + inc == PATROL_BOAT_POS[a]) {
+                        cout << SHIP_NAME << " INTERSECTS PATROL BOAT" << endl;
+                        COLLISION = true;
+                        break;
+                    }
+                }
+
+                if (COLLISION == true) {
+                    break;
+                }
+            }
+
+        }
+        
+        
+        if (SHIP_NAME == "Patrol Boat") {
+            cout << SHIP_NAME << endl;
+            for (int i = 0, inc = 0; i < 2; i++, inc += INCREMENT) {
+                for (int a = 0; a < 5; a++) {
+
+                    cout << LOCATION + inc << endl;
+
+                    if (LOCATION + inc == CARRIER_POS[a]) {
+                        cout << "PATROL BOAT INTERSECTS CARRIER" << endl;
+                        COLLISION = true;
+                        break;
+                    }
+                }
+
+                for (int a = 0; a < 4; a++) {
+                    if (LOCATION + inc == BATTLESHIP_POS[a]) {
+                        cout << "PATROL BOAT INTERSECTS CARRIER" << endl;
+                        COLLISION = true;
+                        break;
+                    }
+                }
+
+                for (int a = 0; a < 3; a++) {
+                    if (LOCATION + inc == DESTROYER_POS[a]) {
+                        cout << "PATROL BOAT INTERSECTS DESTROYER" << endl;
+                        COLLISION = true;
+                        break;
+                    }
+                    else if (LOCATION + inc == SUBMARINE_POS[a]) {
+                        cout << "PATROL BOAT INTERSECTS SUBMARINE" << endl;
+                        COLLISION = true;
+                        break;
+                    }
+                }
+                if (COLLISION == true) {
+                    break;
+                }
+            }
+        };
+
+
+        return COLLISION;
+    };
+
+
+    bool SMART_PLACER(int LOCATION, int CARRIER_POS[5], int BATTLESHIP_POS[4],
+        int DESTROYER_POS[3], int SUBMARINE_POS[3], int PATROL_BOAT_POS[2], string SHIP_NAME) {
+        if (ROTATION == ROTATION_::HORIZONTAL && 
+            OVERLAP_FORBIDDEN_DETECT(LOCATION, 1, 2, 3, 4, LENGTH) == false &&
+            COLLISION_DETECTION(LOCATION, 1, LENGTH, CARRIER_POS, BATTLESHIP_POS, DESTROYER_POS, SUBMARINE_POS, PATROL_BOAT_POS, SHIP_NAME) == false) {
+            SMART_PLACER_POS[0] = to_string(LOCATION);
+            SMART_PLACER_POS[1] = to_string(LOCATION + 1);
+            SMART_PLACER_POS[2] = to_string(LOCATION + 2);
+            SMART_PLACER_POS[3] = to_string(LOCATION + 3);
+            SMART_PLACER_POS[4] = to_string(LOCATION + 4);
+            return true;
+        }
+
+        else if (ROTATION == ROTATION_::VERTICAL && OVERLAP_FORBIDDEN_DETECT(LOCATION, 11, 22, 33, 44, LENGTH) == false &&
+            COLLISION_DETECTION(LOCATION, 11, LENGTH, CARRIER_POS, BATTLESHIP_POS, DESTROYER_POS, SUBMARINE_POS, PATROL_BOAT_POS, SHIP_NAME) == false) {
+            SMART_PLACER_POS[0] = to_string(LOCATION);
+            SMART_PLACER_POS[1] = to_string(LOCATION + 11);
+            SMART_PLACER_POS[2] = to_string(LOCATION + 22);
+            SMART_PLACER_POS[3] = to_string(LOCATION + 33);
+            SMART_PLACER_POS[4] = to_string(LOCATION + 44);
+            return true;
+        }
+
+        else {
+            return false;
+        };        
     };
 };
 
@@ -308,7 +453,25 @@ struct CARRIER_ {
 
     int LOCATION[LENGTH];
     bool IS_DESTROYED = false;
-    bool HOLES_HIT[5] = { false, false, false, false, false };
+    bool HOLES_HIT[LENGTH] = { false, false, false, false, false };
+
+    bool CHECK_SUNK() {
+        int counter = 0;
+
+        for (int i = 0; i < LENGTH; i++) {
+            if (HOLES_HIT[i] == true) {
+                counter++;
+            }
+        }
+
+        if (counter == LENGTH) {
+            return true;
+        }
+        else {
+            return false;
+        };
+    };
+
     PLACER_* PLACER = new PLACER_(LENGTH);
 };
 
@@ -319,6 +482,23 @@ struct BATTLESHIP_ {
     int LOCATION[LENGTH];
     bool IS_DESTROYED = false;
     bool HOLES_HIT[LENGTH] = { false, false, false, false };
+
+    bool CHECK_SUNK() {
+        int counter = 0;
+
+        for (int i = 0; i < LENGTH; i++) {
+            if (HOLES_HIT[i] == true) {
+                counter++;
+            }
+        }
+
+        if (counter == LENGTH) {
+            return true;
+        }
+        else {
+            return false;
+        };
+    };
     PLACER_* PLACER = new PLACER_(LENGTH);
 };
 
@@ -329,6 +509,24 @@ struct DESTROYER_ {
     int LOCATION[LENGTH];
     bool IS_DESTROYED = false;
     bool HOLES_HIT[LENGTH] = { false, false, false };
+
+    bool CHECK_SUNK() {
+        int counter = 0;
+
+        for (int i = 0; i < LENGTH; i++) {
+            if (HOLES_HIT[i] == true) {
+                counter++;
+            }
+        }
+
+        if (counter == LENGTH) {
+            return true;
+        }
+        else {
+            return false;
+        };
+    };
+
     PLACER_* PLACER = new PLACER_(LENGTH);
 };
 
@@ -339,6 +537,23 @@ struct SUBMARINE_ {
     int LOCATION[LENGTH];
     bool IS_DESTROYED = false;
     bool HOLES_HIT[LENGTH] = { false, false, false };
+
+    bool CHECK_SUNK() {
+        int counter = 0;
+
+        for (int i = 0; i < LENGTH; i++) {
+            if (HOLES_HIT[i] == true) {
+                counter++;
+            }
+        }
+
+        if (counter == LENGTH) {
+            return true;
+        }
+        else {
+            return false;
+        };
+    };
     PLACER_* PLACER = new PLACER_(LENGTH);
 };
 
@@ -346,9 +561,26 @@ struct PATROL_BOAT_ {
     string NAME = "Patrol Boat";
     const static int LENGTH = 2;
 
-    int LOCATION[LENGTH];
+    int LOCATION[LENGTH] = { 0, 0 };
     bool IS_DESTROYED = false;
     bool HOLES_HIT[LENGTH] = { false, false };
+
+    bool CHECK_SUNK() {
+        int counter = 0;
+
+        for (int i = 0; i < LENGTH; i++) {
+            if (HOLES_HIT[i] == true) {
+                counter++;
+            }
+        }
+
+        if (counter == LENGTH) {
+            return true;
+        }
+        else {
+            return false;
+        };
+    };
     PLACER_* PLACER = new PLACER_(LENGTH);
 };
 
@@ -388,12 +620,15 @@ struct RADAR_ {
 
 struct FLEET_ {
     string ID;
+    string SHIP_NAME;
+    int SHIP_CHUNK;
     ImVec2 SIZE = ImVec2(50, 50);
     enum STATE_ {
         UNCLICKED,
         MISS,
         HIT,
-        BOAT
+        BOAT,
+        SUNK
     };
 
     STATE_ STATE = STATE_::UNCLICKED;
@@ -415,7 +650,92 @@ public:
 
     FLEET_* FLEET[120];
 
-    void BUTTON_FUNC(string BTN, int arrL) {
+
+    static void UPDATE_SHIP(PLAYER* PTR, int arr_pos) {
+        //Update the holes hit...
+
+        //Carrier
+        if (PTR->FLEET[arr_pos]->SHIP_NAME == PTR->SHIPS->CARRIER->NAME) {
+            PTR->SHIPS->CARRIER->HOLES_HIT[PTR->FLEET[arr_pos]->SHIP_CHUNK] = true;
+        }
+        //Battleship
+        else if (PTR->FLEET[arr_pos]->SHIP_NAME == PTR->SHIPS->BATTLESHIP->NAME) {
+            PTR->SHIPS->BATTLESHIP->HOLES_HIT[PTR->FLEET[arr_pos]->SHIP_CHUNK] = true;
+        }
+        //Destroyer
+        else if (PTR->FLEET[arr_pos]->SHIP_NAME == PTR->SHIPS->DESTROYER->NAME) {
+            PTR->SHIPS->DESTROYER->HOLES_HIT[PTR->FLEET[arr_pos]->SHIP_CHUNK] = true;
+        }
+        //Submarine
+        else if (PTR->FLEET[arr_pos]->SHIP_NAME == PTR->SHIPS->SUBMARINE->NAME) {
+            PTR->SHIPS->SUBMARINE->HOLES_HIT[PTR->FLEET[arr_pos]->SHIP_CHUNK] = true;
+        }
+        //Patrol Boat
+        else if (PTR->FLEET[arr_pos]->SHIP_NAME == PTR->SHIPS->PATROL_BOAT->NAME) {
+            PTR->SHIPS->PATROL_BOAT->HOLES_HIT[PTR->FLEET[arr_pos]->SHIP_CHUNK] = true;
+        }
+
+        //Check to see if anything is sunk...
+        //Carrier
+        if (PTR->SHIPS->CARRIER->CHECK_SUNK() == true) {
+            for (int i = 0; i < 5; i++) {
+                PTR->FLEET[PTR->SHIPS->CARRIER->LOCATION[i]]->STATE = PTR->FLEET[PTR->SHIPS->CARRIER->LOCATION[i]]->STATE_::SUNK;
+            };
+        };
+        //Battleship
+        if (PTR->SHIPS->BATTLESHIP->CHECK_SUNK() == true) {
+            for (int i = 0; i < 4; i++) {
+                PTR->FLEET[PTR->SHIPS->BATTLESHIP->LOCATION[i]]->STATE = PTR->FLEET[PTR->SHIPS->BATTLESHIP->LOCATION[i]]->STATE_::SUNK;
+            };
+        };
+        //Destroyer
+        if (PTR->SHIPS->DESTROYER->CHECK_SUNK() == true) {
+            for (int i = 0; i < 3; i++) {
+                PTR->FLEET[PTR->SHIPS->DESTROYER->LOCATION[i]]->STATE = PTR->FLEET[PTR->SHIPS->DESTROYER->LOCATION[i]]->STATE_::SUNK;
+            };
+        };
+        //Submarine
+        if (PTR->SHIPS->SUBMARINE->CHECK_SUNK() == true) {
+            for (int i = 0; i < 3; i++) {
+                PTR->FLEET[PTR->SHIPS->SUBMARINE->LOCATION[i]]->STATE = PTR->FLEET[PTR->SHIPS->SUBMARINE->LOCATION[i]]->STATE_::SUNK;
+            };
+        };
+        //Patrol Boat
+        if (PTR->SHIPS->PATROL_BOAT->CHECK_SUNK() == true) {
+            for (int i = 0; i < 2; i++) {
+                PTR->FLEET[PTR->SHIPS->PATROL_BOAT->LOCATION[i]]->STATE = PTR->FLEET[PTR->SHIPS->PATROL_BOAT->LOCATION[i]]->STATE_::SUNK;
+            };
+        };
+    };
+
+    static void WAIT_TURN(PLAYER* PTR) {
+        if (is_host == true) {
+            do {
+                Sleep(1000);
+            } while (SERVER::RECENTMESSAGE.substr(0, 2) != "F@");
+            cout << SERVER::RECENTMESSAGE.substr(2, SERVER::RECENTMESSAGE.length()) << endl;
+            int arr_pos = stoi(SERVER::RECENTMESSAGE.substr(2, SERVER::RECENTMESSAGE.length()));
+
+            if (PTR->FLEET[arr_pos]->STATE == PTR->FLEET[arr_pos]->STATE_::BOAT) {
+                cout << "HIT" << endl;
+                SERVER::SEND("R@HIT" + to_string(arr_pos));
+                PTR->FLEET[arr_pos]->STATE = PTR->FLEET[arr_pos]->STATE_::HIT;
+                SERVER::RECENTMESSAGE = "";
+
+                PTR->UPDATE_SHIP(PTR, arr_pos);
+            }
+        }
+        else {
+            do {
+                Sleep(1000);
+            } while (CLIENT::RECENTMESSAGE.substr(0, 1) != "F@");
+        }
+
+
+        PTR->is_turn = true;
+    }
+
+    void BUTTON_FUNC(string BTN, int arrL, PLAYER* PTR) {
         bool is_forbidden = false;
         for (int i = 0; i < 21; i++) {
             if (arrL == RADAR[arrL]->FORBIDDEN_BUTTONS[i]) {
@@ -425,6 +745,8 @@ public:
         };
 
         if (is_forbidden == false && is_turn == true && RADAR[arrL]->STATE == RADAR[arrL]->STATE_::UNCLICKED) {
+
+            //Server
             if (is_host == true) {
                 thread sendth(SERVER::SEND, ("F@" + to_string(arrL)));
                 sendth.join();
@@ -436,22 +758,63 @@ public:
                     int index = stoi(SERVER::RECENTMESSAGE.substr(5, SERVER::RECENTMESSAGE.length()));
                     RADAR[index]->STATE = RADAR[index]->STATE_::HIT;
                     RADAR[index]->ID += "\nHIT";
-                    SERVER::RECENTMESSAGE = "";
                 }
 
                 else if (SERVER::RECENTMESSAGE.substr(0, 6) == "R@MISS") {
                     int index = stoi(SERVER::RECENTMESSAGE.substr(6, SERVER::RECENTMESSAGE.length()));
                     RADAR[index]->STATE = RADAR[index]->STATE_::MISS;
                     RADAR[index]->ID += "\nMISS";
-                    SERVER::RECENTMESSAGE = "";
                 }
 
+
                 else if (SERVER::RECENTMESSAGE.substr(0, 6) == "R@SUNK") {
-                    int index = stoi(SERVER::RECENTMESSAGE.substr(6, SERVER::RECENTMESSAGE.length()));
+                    //int index = stoi(SERVER::RECENTMESSAGE.substr(6, SERVER::RECENTMESSAGE.length()));
+                    string msg = SERVER::RECENTMESSAGE.substr(6, SERVER::RECENTMESSAGE.length());
+                    int begin = 0;
+                    int locations[5];
+                    for (int i = 0; i < msg.length(); i++) {
+                        if (msg.at(i) == ':') {
+
+                        }
+                    }
+                    //RADAR[index]->STATE = RADAR[index]->STATE_::SUNK;
+                    //RADAR[index]->ID += "\nSUNK";
+                }
+                SERVER::RECENTMESSAGE = "";
+                is_turn = false;
+                SERVER::SEND("TURN");
+                //thread T(WAIT_TURN, PTR);
+                //T.join();
+            }
+            //Client
+            else {
+                thread sendth(CLIENT::SEND, ("F@" + to_string(arrL)));
+                sendth.join();
+                cout << "waiting for response..." << endl;
+                do {
+                    Sleep(1000);
+                } while (CLIENT::RECENTMESSAGE == "");
+                if (CLIENT::RECENTMESSAGE.substr(0, 5) == "R@HIT") {
+                    int index = stoi(CLIENT::RECENTMESSAGE.substr(5, CLIENT::RECENTMESSAGE.length()));
+                    RADAR[index]->STATE = RADAR[index]->STATE_::HIT;
+                    RADAR[index]->ID += "\nHIT";
+                    CLIENT::RECENTMESSAGE = "";
+                }
+
+                else if (CLIENT::RECENTMESSAGE.substr(0, 6) == "R@MISS") {
+                    int index = stoi(CLIENT::RECENTMESSAGE.substr(6, CLIENT::RECENTMESSAGE.length()));
+                    RADAR[index]->STATE = RADAR[index]->STATE_::MISS;
+                    RADAR[index]->ID += "\nMISS";
+                    CLIENT::RECENTMESSAGE = "";
+                }
+
+                else if (CLIENT::RECENTMESSAGE.substr(0, 6) == "R@SUNK") {
+                    int index = stoi(CLIENT::RECENTMESSAGE.substr(6, CLIENT::RECENTMESSAGE.length()));
                     RADAR[index]->STATE = RADAR[index]->STATE_::SUNK;
                     RADAR[index]->ID += "\nSUNK";
-                    SERVER::RECENTMESSAGE = "";
+                    CLIENT::RECENTMESSAGE = "";
                 }
+                //is_turn = false;
             }
         };        
     }
@@ -491,7 +854,7 @@ public:
             else {
                 u++;
             }            
-            cout << RADAR[i]->ID << endl;
+            cout << "ARR POS -> " << i << " ID ->  " << RADAR[i]->ID << endl;
         };
         
     }
@@ -517,90 +880,124 @@ public:
             else if (SHIPS->CARRIER->LOCATION[0] == i) {
                 ID = LETTERS[L] + "-" + to_string(u) + "\nCARR-";
                 FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+                FLEET[i]->SHIP_NAME = SHIPS->CARRIER->NAME;
+                FLEET[i]->SHIP_CHUNK = 0;
             }
 
             else if (SHIPS->CARRIER->LOCATION[1] == i) {
                 ID = LETTERS[L] + "-" + to_string(u) + "\nCARR-";
                 FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+                FLEET[i]->SHIP_NAME = SHIPS->CARRIER->NAME;
+                FLEET[i]->SHIP_CHUNK = 1;
             }
 
             else if (SHIPS->CARRIER->LOCATION[2] == i) {
                 ID = LETTERS[L] + "-" + to_string(u) + "\nCARR-";
                 FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+                FLEET[i]->SHIP_NAME = SHIPS->CARRIER->NAME;
+                FLEET[i]->SHIP_CHUNK = 2;
             }
 
             else if (SHIPS->CARRIER->LOCATION[3] == i) {
                 ID = LETTERS[L] + "-" + to_string(u) + "\nCARR-";
                 FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+                FLEET[i]->SHIP_NAME = SHIPS->CARRIER->NAME;
+                FLEET[i]->SHIP_CHUNK = 3;
             }
 
             else if (SHIPS->CARRIER->LOCATION[4] == i) {
                 ID = LETTERS[L] + "-" + to_string(u) + "\nCARR-";
                 FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+                FLEET[i]->SHIP_NAME = SHIPS->CARRIER->NAME;
+                FLEET[i]->SHIP_CHUNK = 4;
             }
 
             //register battleships
             else if (SHIPS->BATTLESHIP->LOCATION[0] == i) {
                 ID = LETTERS[L] + "-" + to_string(u) + "\nBATT-";
                 FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+                FLEET[i]->SHIP_NAME = SHIPS->BATTLESHIP->NAME;
+                FLEET[i]->SHIP_CHUNK = 0;
             }
 
             else if (SHIPS->BATTLESHIP->LOCATION[1] == i) {
                 ID = LETTERS[L] + "-" + to_string(u) + "\nBATT-";
                 FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+                FLEET[i]->SHIP_NAME = SHIPS->BATTLESHIP->NAME;
+                FLEET[i]->SHIP_CHUNK = 1;
             }
 
             else if (SHIPS->BATTLESHIP->LOCATION[2] == i) {
                 ID = LETTERS[L] + "-" + to_string(u) + "\nBATT-";
                 FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+                FLEET[i]->SHIP_NAME = SHIPS->BATTLESHIP->NAME;
+                FLEET[i]->SHIP_CHUNK = 2;
             }
 
             else if (SHIPS->BATTLESHIP->LOCATION[3] == i) {
                 ID = LETTERS[L] + "-" + to_string(u) + "\nBATT-";
                 FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+                FLEET[i]->SHIP_NAME = SHIPS->BATTLESHIP->NAME;
+                FLEET[i]->SHIP_CHUNK = 3;
             }
 
             //register Destroyers
             else if (SHIPS->DESTROYER->LOCATION[0] == i) {
                 ID = LETTERS[L] + "-" + to_string(u) + "\nDEST-";
                 FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+                FLEET[i]->SHIP_NAME = SHIPS->DESTROYER->NAME;
+                FLEET[i]->SHIP_CHUNK = 0;
             }
 
             else if (SHIPS->DESTROYER->LOCATION[1] == i) {
                 ID = LETTERS[L] + "-" + to_string(u) + "\nDEST-";
                 FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+                FLEET[i]->SHIP_NAME = SHIPS->DESTROYER->NAME;
+                FLEET[i]->SHIP_CHUNK = 1;
             }
 
             else if (SHIPS->DESTROYER->LOCATION[2] == i) {
                 ID = LETTERS[L] + "-" + to_string(u) + "\nDEST-";
                 FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+                FLEET[i]->SHIP_NAME = SHIPS->DESTROYER->NAME;
+                FLEET[i]->SHIP_CHUNK = 2;
             }
 
             //register Submarines
             else if (SHIPS->SUBMARINE->LOCATION[0] == i) {
                 ID = LETTERS[L] + "-" + to_string(u) + "\nSUB-";
                 FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+                FLEET[i]->SHIP_NAME = SHIPS->SUBMARINE->NAME;
+                FLEET[i]->SHIP_CHUNK = 0;
             }
 
             else if (SHIPS->SUBMARINE->LOCATION[1] == i) {
                 ID = LETTERS[L] + "-" + to_string(u) + "\nSUB-";
                 FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+                FLEET[i]->SHIP_NAME = SHIPS->SUBMARINE->NAME;
+                FLEET[i]->SHIP_CHUNK = 1;
             }
 
             else if (SHIPS->SUBMARINE->LOCATION[2] == i) {
                 ID = LETTERS[L] + "-" + to_string(u) + "\nSUB-";
                 FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+                FLEET[i]->SHIP_NAME = SHIPS->SUBMARINE->NAME;
+                FLEET[i]->SHIP_CHUNK = 2;
             }
 
             //register patrol boats
             else if (SHIPS->PATROL_BOAT->LOCATION[0] == i) {
                 ID = LETTERS[L] + "-" + to_string(u) + "\nPATR-";
                 FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+                FLEET[i]->SHIP_NAME = SHIPS->PATROL_BOAT->NAME;
+                FLEET[i]->SHIP_CHUNK = 0;
             }
 
             else if (SHIPS->PATROL_BOAT->LOCATION[1] == i) {
                 ID = LETTERS[L] + "-" + to_string(u) + "\nPATR-";
                 FLEET[i]->STATE = FLEET[i]->STATE_::BOAT;
+                FLEET[i]->SHIP_NAME = SHIPS->PATROL_BOAT->NAME;
+                FLEET[i]->SHIP_CHUNK = 1;
             }
 
             else {
@@ -808,8 +1205,9 @@ int main(int, char**)
     bool show_game_window = false;
     bool show_config_window = true;
     bool placed_ships = false;
+    bool pass_def = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-    static char INPUT[5][1250] = { {"12"}, {"23"}, {"34"}, {"45"}, {"56"} };
+    static char INPUT[5][1250] = { {"A-1"}, {"B-1"}, {"C-1"}, {"D-1"}, {"E-1"} };
     
     
     
@@ -890,7 +1288,7 @@ int main(int, char**)
 
                         if (ImGui::Button(name.c_str(), POINTER->FLEET[i]->SIZE)) {
                             if (POINTER->is_turn == true) {
-                                POINTER->BUTTON_FUNC(POINTER->FLEET[i]->ID, i);
+                                POINTER->BUTTON_FUNC(POINTER->FLEET[i]->ID, i, POINTER);
                             }
                         };
                         ImGui::PopStyleColor();
@@ -903,7 +1301,7 @@ int main(int, char**)
 
                         if (ImGui::Button(name.c_str(), POINTER->FLEET[i]->SIZE)) {
                             if (POINTER->is_turn == true) {
-                                POINTER->BUTTON_FUNC(POINTER->FLEET[i]->ID, i);
+                                POINTER->BUTTON_FUNC(POINTER->FLEET[i]->ID, i, POINTER);
                             }
                         };
                         ImGui::PopStyleColor();
@@ -916,7 +1314,20 @@ int main(int, char**)
 
                         if (ImGui::Button(name.c_str(), POINTER->FLEET[i]->SIZE)) {
                             if (POINTER->is_turn == true) {
-                                POINTER->BUTTON_FUNC(POINTER->FLEET[i]->ID, i);
+                                POINTER->BUTTON_FUNC(POINTER->FLEET[i]->ID, i, POINTER);
+                            }
+                        };
+                        ImGui::PopStyleColor();
+                    }
+
+                    else if (POINTER->FLEET[i]->STATE == POINTER->FLEET[i]->STATE_::SUNK) {
+                        ImGui::PushStyleColor(ImGuiCol_Button, COLOR().SUNK);
+                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, COLOR().SUNK);
+                        ImGui::PushStyleColor(ImGuiCol_ButtonActive, COLOR().SUNK);
+
+                        if (ImGui::Button(name.c_str(), POINTER->FLEET[i]->SIZE)) {
+                            if (POINTER->is_turn == true) {
+                                //POINTER->BUTTON_FUNC(POINTER->RADAR[i]->ID, i, POINTER);
                             }
                         };
                         ImGui::PopStyleColor();
@@ -928,7 +1339,7 @@ int main(int, char**)
                         ImGui::PushStyleColor(ImGuiCol_ButtonActive, COLOR().DEFAULT);
                         if (ImGui::Button(name.c_str(), POINTER->FLEET[i]->SIZE)) {
                             if (POINTER->is_turn == true) {
-                                POINTER->BUTTON_FUNC(POINTER->FLEET[i]->ID, i);
+                                POINTER->BUTTON_FUNC(POINTER->FLEET[i]->ID, i, POINTER);
                             }
                         };
                         ImGui::PopStyleColor();
@@ -946,11 +1357,25 @@ int main(int, char**)
         ImGui::SetNextWindowSize(ImVec2(PLAYER_RADAR().WIDTH, PLAYER_RADAR().HEIGHT));
 
         ImGui::Begin("Radar", (bool*)false, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);                          // Create a window called "Hello, world!" and append into it.
-        ImGui::Columns(11, NULL, false);
+        ImGui::Columns(11, NULL, false);       
+
+        //This makes it so the radar updates before i make the player wait for the other player
+        if (POINTER->is_turn == false && pass_def == true) {
+            thread T((POINTER->WAIT_TURN), POINTER);
+            T.join();
+            cout << "Other player has taken turn..." << endl;
+            pass_def = false;
+        }
+        else if (POINTER->is_turn == false && pass_def == false) {
+            pass_def = true;
+        };
 
         string name;
         for (int i = 0; i != 121; i++) {
             name = POINTER->RADAR[i]->ID;
+
+            
+
             if (name == "INV") {
                 ImGui::InvisibleButton("INV", POINTER->RADAR[i]->SIZE);
             }
@@ -963,7 +1388,7 @@ int main(int, char**)
 
                     if (ImGui::Button(name.c_str(), POINTER->RADAR[i]->SIZE)) {
                         if (POINTER->is_turn == true) {
-                            POINTER->BUTTON_FUNC(POINTER->RADAR[i]->ID, i);
+                            //POINTER->BUTTON_FUNC(POINTER->RADAR[i]->ID, i, POINTER);
                         }
                     };
                     ImGui::PopStyleColor();
@@ -976,7 +1401,20 @@ int main(int, char**)
 
                     if (ImGui::Button(name.c_str(), POINTER->RADAR[i]->SIZE)) {
                         if (POINTER->is_turn == true) {
-                            POINTER->BUTTON_FUNC(POINTER->RADAR[i]->ID, i);
+                            //POINTER->BUTTON_FUNC(POINTER->RADAR[i]->ID, i, POINTER);
+                        }
+                    };
+                    ImGui::PopStyleColor();
+                }
+
+                else if (POINTER->RADAR[i]->STATE == POINTER->RADAR[i]->STATE_::SUNK) {
+                    ImGui::PushStyleColor(ImGuiCol_Button, COLOR().SUNK);
+                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, COLOR().SUNK);
+                    ImGui::PushStyleColor(ImGuiCol_ButtonActive, COLOR().SUNK);
+
+                    if (ImGui::Button(name.c_str(), POINTER->RADAR[i]->SIZE)) {
+                        if (POINTER->is_turn == true) {
+                            //POINTER->BUTTON_FUNC(POINTER->RADAR[i]->ID, i, POINTER);
                         }
                     };
                     ImGui::PopStyleColor();
@@ -988,17 +1426,16 @@ int main(int, char**)
                     ImGui::PushStyleColor(ImGuiCol_ButtonActive, COLOR().DEFAULT);
                     if (ImGui::Button(name.c_str(), POINTER->RADAR[i]->SIZE)) {
                         if (POINTER->is_turn == true) {
-                            POINTER->BUTTON_FUNC(POINTER->RADAR[i]->ID, i);
+                            POINTER->BUTTON_FUNC(POINTER->RADAR[i]->ID, i, POINTER);          
                         }
                     };
                     ImGui::PopStyleColor();
-                };
+                };                
             }
             ImGui::NextColumn();
         };
 
-        ImGui::End();
-
+        ImGui::End();        
         }
 
         //Waiting window
@@ -1016,60 +1453,84 @@ int main(int, char**)
         if (show_config_window) {
             ImGui::SetNextWindowPos(ImVec2(PLAYER_RADAR().X, PLAYER_RADAR().Y));
             ImGui::SetNextWindowSize(ImVec2(PLAYER_VIEW().WIDTH, PLAYER_VIEW().HEIGHT));
-            ImGui::Begin("Config");            
+            ImGui::Begin("Config", (bool*)false, ImGuiWindowFlags_NoResize);            
             if (placed_ships == false) {
                 ImGui::Text((POINTER->name + "'s ships").c_str());
-                ImGui::Text((POINTER->SHIPS->CARRIER->NAME).c_str());
-                ImGui::InputText("Carrier pos", INPUT[0], IM_ARRAYSIZE(INPUT[0]));
-                if (ImGui::Button("Horizontal")) {
-                    POINTER->SHIPS->CARRIER->PLACER->ROTATION = POINTER->SHIPS->CARRIER->PLACER->ROTATION_::HORIZONTAL;
-                }
 
-                if (ImGui::Button("Vertical")) {
-                    POINTER->SHIPS->CARRIER->PLACER->ROTATION = POINTER->SHIPS->CARRIER->PLACER->ROTATION_::VERTICAL;
+                if (ImGui::TreeNode("Carrier")) {
+                    //Get the input of where the ship goes
+                    ImGui::InputText("Carrier pos", INPUT[0], IM_ARRAYSIZE(INPUT[0]));
+                    ImGui::SameLine();
+                    HelpMarker(("Please input the tile of which you would like the ship to be on...\nWhen horizontal, ship goes from LEFT TO RIGHT...\nWhen vertical, ship goes from UP TO DOWN\nPlease use the buttons to toggle between horizontal and vertical..."));
+                    //Buttons to toggle between Horizontal and Vertical
+                    if (ImGui::Button("Horizontal")) {
+                        //Set the rotation
+                        POINTER->SHIPS->CARRIER->PLACER->ROTATION = POINTER->SHIPS->CARRIER->PLACER->ROTATION_::HORIZONTAL;
+                    }
+
+                    if (ImGui::Button("Vertical")) {
+                        POINTER->SHIPS->CARRIER->PLACER->ROTATION = POINTER->SHIPS->CARRIER->PLACER->ROTATION_::VERTICAL;
+                    }
+                    ImGui::TreePop();
                 }
                 //##############################
-                ImGui::InputText("Battleship pos", INPUT[1], IM_ARRAYSIZE(INPUT[1]));
-                if (ImGui::Button("Horizontal ")) {
-                    POINTER->SHIPS->BATTLESHIP->PLACER->ROTATION = POINTER->SHIPS->BATTLESHIP->PLACER->ROTATION_::HORIZONTAL;
-                }
+                if (ImGui::TreeNode("Battleship")) {
+                    ImGui::InputText("Battleship pos", INPUT[1], IM_ARRAYSIZE(INPUT[1]));
+                    if (ImGui::Button("Horizontal ")) {
+                        POINTER->SHIPS->BATTLESHIP->PLACER->ROTATION = POINTER->SHIPS->BATTLESHIP->PLACER->ROTATION_::HORIZONTAL;
+                    }
 
-                if (ImGui::Button("Vertical ")) {
-                    POINTER->SHIPS->BATTLESHIP->PLACER->ROTATION = POINTER->SHIPS->BATTLESHIP->PLACER->ROTATION_::VERTICAL;
+                    if (ImGui::Button("Vertical ")) {
+                        POINTER->SHIPS->BATTLESHIP->PLACER->ROTATION = POINTER->SHIPS->BATTLESHIP->PLACER->ROTATION_::VERTICAL;
+                    }
+                    ImGui::TreePop();
                 }
                 //##############################
-                ImGui::InputText("Destroyer pos", INPUT[2], IM_ARRAYSIZE(INPUT[2]));
-                if (ImGui::Button("Horizontal  ")) {
-                    POINTER->SHIPS->DESTROYER->PLACER->ROTATION = POINTER->SHIPS->DESTROYER->PLACER->ROTATION_::HORIZONTAL;
-                }
+                if (ImGui::TreeNode("Destroyer")) {
+                    ImGui::InputText("Destroyer pos", INPUT[2], IM_ARRAYSIZE(INPUT[2]));
+                    if (ImGui::Button("Horizontal  ")) {
+                        POINTER->SHIPS->DESTROYER->PLACER->ROTATION = POINTER->SHIPS->DESTROYER->PLACER->ROTATION_::HORIZONTAL;
+                    }
 
-                if (ImGui::Button("Vertical  ")) {
-                    POINTER->SHIPS->DESTROYER->PLACER->ROTATION = POINTER->SHIPS->DESTROYER->PLACER->ROTATION_::VERTICAL;
+                    if (ImGui::Button("Vertical  ")) {
+                        POINTER->SHIPS->DESTROYER->PLACER->ROTATION = POINTER->SHIPS->DESTROYER->PLACER->ROTATION_::VERTICAL;
+                    }
+                    ImGui::TreePop();
                 }
                 //##############################
-                ImGui::InputText("Submarine pos", INPUT[3], IM_ARRAYSIZE(INPUT[3]));
-                if (ImGui::Button("Horizontal   ")) {
-                    POINTER->SHIPS->SUBMARINE->PLACER->ROTATION = POINTER->SHIPS->SUBMARINE->PLACER->ROTATION_::HORIZONTAL;
-                }
+                if (ImGui::TreeNode("Submarine")) {
+                    ImGui::InputText("Submarine pos", INPUT[3], IM_ARRAYSIZE(INPUT[3]));
+                    if (ImGui::Button("Horizontal   ")) {
+                        POINTER->SHIPS->SUBMARINE->PLACER->ROTATION = POINTER->SHIPS->SUBMARINE->PLACER->ROTATION_::HORIZONTAL;
+                    }
 
-                if (ImGui::Button("Vertical   ")) {
-                    POINTER->SHIPS->SUBMARINE->PLACER->ROTATION = POINTER->SHIPS->SUBMARINE->PLACER->ROTATION_::VERTICAL;
+                    if (ImGui::Button("Vertical   ")) {
+                        POINTER->SHIPS->SUBMARINE->PLACER->ROTATION = POINTER->SHIPS->SUBMARINE->PLACER->ROTATION_::VERTICAL;
+                    }
+                    ImGui::TreePop();
                 }
                 //##############################
-                ImGui::InputText("Patrol Boat pos", INPUT[4], IM_ARRAYSIZE(INPUT[4]));
-                if (ImGui::Button("Horizontal    ")) {
-                    POINTER->SHIPS->PATROL_BOAT->PLACER->ROTATION = POINTER->SHIPS->PATROL_BOAT->PLACER->ROTATION_::HORIZONTAL;
-                }
+                if (ImGui::TreeNode("Patrol Boat")) {
+                    ImGui::InputText("Patrol Boat pos", INPUT[4], IM_ARRAYSIZE(INPUT[4]));
+                    if (ImGui::Button("Horizontal    ")) {
+                        POINTER->SHIPS->PATROL_BOAT->PLACER->ROTATION = POINTER->SHIPS->PATROL_BOAT->PLACER->ROTATION_::HORIZONTAL;
+                    }
 
-                if (ImGui::Button("Vertical    ")) {
-                    POINTER->SHIPS->PATROL_BOAT->PLACER->ROTATION = POINTER->SHIPS->PATROL_BOAT->PLACER->ROTATION_::VERTICAL;
+                    if (ImGui::Button("Vertical    ")) {
+                        POINTER->SHIPS->PATROL_BOAT->PLACER->ROTATION = POINTER->SHIPS->PATROL_BOAT->PLACER->ROTATION_::VERTICAL;
+                    }                    
+                    ImGui::TreePop();
                 }
                 
                 
 
                 if (ImGui::Button("Done?")) {
                     
-                    if (POINTER->SHIPS->CARRIER->PLACER->SMART_PLACER(stoi(INPUT[0])) == true) {
+                    if (POINTER->SHIPS->CARRIER->PLACER->SMART_PLACER(GAME::POS_TO_ARR(INPUT[0]), 
+                        POINTER->SHIPS->CARRIER->LOCATION, POINTER->SHIPS->BATTLESHIP->LOCATION, POINTER->SHIPS->DESTROYER->LOCATION,
+                        POINTER->SHIPS->SUBMARINE->LOCATION, POINTER->SHIPS->PATROL_BOAT->LOCATION, POINTER->SHIPS->CARRIER->NAME) == true) {
+
+
                         POINTER->SHIPS->VALID_POS[0] = true;
                         POINTER->SHIPS->CARRIER->LOCATION[0] = stoi(POINTER->SHIPS->CARRIER->PLACER->SMART_PLACER_POS[0]);
                         POINTER->SHIPS->CARRIER->LOCATION[1] = stoi(POINTER->SHIPS->CARRIER->PLACER->SMART_PLACER_POS[1]);
@@ -1082,7 +1543,10 @@ int main(int, char**)
                         cout << "INVALID POSITION @ CARRIER" << endl;
                     };                 
                     //#####################
-                    if (POINTER->SHIPS->BATTLESHIP->PLACER->SMART_PLACER(stoi(INPUT[1])) == true) {
+                    if (POINTER->SHIPS->BATTLESHIP->PLACER->SMART_PLACER(GAME::POS_TO_ARR(INPUT[1]),
+                        POINTER->SHIPS->CARRIER->LOCATION, POINTER->SHIPS->BATTLESHIP->LOCATION, POINTER->SHIPS->DESTROYER->LOCATION,
+                        POINTER->SHIPS->SUBMARINE->LOCATION, POINTER->SHIPS->PATROL_BOAT->LOCATION, POINTER->SHIPS->BATTLESHIP->NAME) == true) {
+
                         POINTER->SHIPS->VALID_POS[1] = true;
                         POINTER->SHIPS->BATTLESHIP->LOCATION[0] = stoi(POINTER->SHIPS->BATTLESHIP->PLACER->SMART_PLACER_POS[0]);
                         POINTER->SHIPS->BATTLESHIP->LOCATION[1] = stoi(POINTER->SHIPS->BATTLESHIP->PLACER->SMART_PLACER_POS[1]);
@@ -1094,7 +1558,9 @@ int main(int, char**)
                         cout << "INVALID POSITION @ BATTLESHIP" << endl;
                     };
                     //#####################
-                    if (POINTER->SHIPS->DESTROYER->PLACER->SMART_PLACER(stoi(INPUT[2])) == true) {
+                    if (POINTER->SHIPS->DESTROYER->PLACER->SMART_PLACER(GAME::POS_TO_ARR(INPUT[2]),
+                        POINTER->SHIPS->CARRIER->LOCATION, POINTER->SHIPS->BATTLESHIP->LOCATION, POINTER->SHIPS->DESTROYER->LOCATION,
+                        POINTER->SHIPS->SUBMARINE->LOCATION, POINTER->SHIPS->PATROL_BOAT->LOCATION, POINTER->SHIPS->DESTROYER->NAME) == true) {
                         POINTER->SHIPS->VALID_POS[2] = true;
                         POINTER->SHIPS->DESTROYER->LOCATION[0] = stoi(POINTER->SHIPS->DESTROYER->PLACER->SMART_PLACER_POS[0]);
                         POINTER->SHIPS->DESTROYER->LOCATION[1] = stoi(POINTER->SHIPS->DESTROYER->PLACER->SMART_PLACER_POS[1]);
@@ -1105,7 +1571,9 @@ int main(int, char**)
                         cout << "INVALID POSITION @ DESTROYER" << endl;
                     };
                     //#####################
-                    if (POINTER->SHIPS->SUBMARINE->PLACER->SMART_PLACER(stoi(INPUT[3])) == true) {
+                    if (POINTER->SHIPS->SUBMARINE->PLACER->SMART_PLACER(GAME::POS_TO_ARR(INPUT[3]),
+                        POINTER->SHIPS->CARRIER->LOCATION, POINTER->SHIPS->BATTLESHIP->LOCATION, POINTER->SHIPS->DESTROYER->LOCATION,
+                        POINTER->SHIPS->SUBMARINE->LOCATION, POINTER->SHIPS->PATROL_BOAT->LOCATION, POINTER->SHIPS->SUBMARINE->NAME) == true) {
                         POINTER->SHIPS->VALID_POS[3] = true;
                         POINTER->SHIPS->SUBMARINE->LOCATION[0] = stoi(POINTER->SHIPS->SUBMARINE->PLACER->SMART_PLACER_POS[0]);
                         POINTER->SHIPS->SUBMARINE->LOCATION[1] = stoi(POINTER->SHIPS->SUBMARINE->PLACER->SMART_PLACER_POS[1]);
@@ -1116,7 +1584,9 @@ int main(int, char**)
                         cout << "INVALID POSITION @ SUBMARINE" << endl;
                     };
                     //#####################
-                    if (POINTER->SHIPS->PATROL_BOAT->PLACER->SMART_PLACER(stoi(INPUT[4])) == true) {
+                    if (POINTER->SHIPS->PATROL_BOAT->PLACER->SMART_PLACER(GAME::POS_TO_ARR(INPUT[4]),
+                        POINTER->SHIPS->CARRIER->LOCATION, POINTER->SHIPS->BATTLESHIP->LOCATION, POINTER->SHIPS->DESTROYER->LOCATION,
+                        POINTER->SHIPS->SUBMARINE->LOCATION, POINTER->SHIPS->PATROL_BOAT->LOCATION, POINTER->SHIPS->PATROL_BOAT->NAME) == true) {
                         POINTER->SHIPS->VALID_POS[4] = true;
                         POINTER->SHIPS->PATROL_BOAT->LOCATION[0] = stoi(POINTER->SHIPS->PATROL_BOAT->PLACER->SMART_PLACER_POS[0]);
                         POINTER->SHIPS->PATROL_BOAT->LOCATION[1] = stoi(POINTER->SHIPS->PATROL_BOAT->PLACER->SMART_PLACER_POS[1]);

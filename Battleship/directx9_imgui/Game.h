@@ -35,6 +35,8 @@ namespace std {
 			P1,
 			P2
 		};
+
+		static int POS_TO_ARR(string POS);
 	};
 
 }

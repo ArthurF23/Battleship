@@ -1,0 +1,222 @@
+if (LENGTH == 5) {
+
+
+            if (ROTATION == ROTATION_::HORIZONTAL && OVERLAP_FORBIDDEN_DETECT(LOCATION, 1, 2, 3, 4, LENGTH) == false) {
+                SMART_PLACER_POS[0] = to_string(LOCATION);
+                SMART_PLACER_POS[1] = to_string(LOCATION + 1);
+                SMART_PLACER_POS[2] = to_string(LOCATION + 2);
+                SMART_PLACER_POS[3] = to_string(LOCATION + 3);
+                SMART_PLACER_POS[4] = to_string(LOCATION + 4);
+                return true;
+            }
+
+            else if (ROTATION == ROTATION_::VERTICAL && OVERLAP_FORBIDDEN_DETECT(LOCATION, 11, 22, 33, 44, LENGTH) == false) {
+                SMART_PLACER_POS[0] = to_string(LOCATION);
+                SMART_PLACER_POS[1] = to_string(LOCATION + 11);
+                SMART_PLACER_POS[2] = to_string(LOCATION + 22);
+                SMART_PLACER_POS[3] = to_string(LOCATION + 33);
+                SMART_PLACER_POS[4] = to_string(LOCATION + 44);
+                return true;
+            }
+
+            else {
+                return false;
+            };
+
+        }
+
+        else if (LENGTH == 4) {
+
+            if (ROTATION == ROTATION_::HORIZONTAL && OVERLAP_FORBIDDEN_DETECT(LOCATION, 1, 2, 3, 4, LENGTH) == false) {
+                SMART_PLACER_POS[0] = to_string(LOCATION);
+                SMART_PLACER_POS[1] = to_string(LOCATION + 1);
+                SMART_PLACER_POS[2] = to_string(LOCATION + 2);
+                SMART_PLACER_POS[3] = to_string(LOCATION + 3);
+                SMART_PLACER_POS[4] = to_string(LOCATION + 4);
+                return true;
+            }
+
+            else if (ROTATION == ROTATION_::VERTICAL && OVERLAP_FORBIDDEN_DETECT(LOCATION, 11, 22, 33, 44, LENGTH) == false) {
+                SMART_PLACER_POS[0] = to_string(LOCATION);
+                SMART_PLACER_POS[1] = to_string(LOCATION + 11);
+                SMART_PLACER_POS[2] = to_string(LOCATION + 22);
+                SMART_PLACER_POS[3] = to_string(LOCATION + 33);
+                SMART_PLACER_POS[4] = to_string(LOCATION + 44);
+                return true;
+            }
+
+            else {
+                return false;
+            };
+        }
+
+        else if (LENGTH == 3) {
+
+            if (ROTATION == ROTATION_::HORIZONTAL && OVERLAP_FORBIDDEN_DETECT(LOCATION, 1, 2, 3, 4, LENGTH) == false) {
+                SMART_PLACER_POS[0] = to_string(LOCATION);
+                SMART_PLACER_POS[1] = to_string(LOCATION + 1);
+                SMART_PLACER_POS[2] = to_string(LOCATION + 2);
+                SMART_PLACER_POS[3] = to_string(LOCATION + 3);
+                SMART_PLACER_POS[4] = to_string(LOCATION + 4);
+                return true;
+            }
+
+            else if (ROTATION == ROTATION_::VERTICAL && OVERLAP_FORBIDDEN_DETECT(LOCATION, 11, 22, 33, 44, LENGTH) == false) {
+                SMART_PLACER_POS[0] = to_string(LOCATION);
+                SMART_PLACER_POS[1] = to_string(LOCATION + 11);
+                SMART_PLACER_POS[2] = to_string(LOCATION + 22);
+                SMART_PLACER_POS[3] = to_string(LOCATION + 33);
+                SMART_PLACER_POS[4] = to_string(LOCATION + 44);
+                return true;
+            }
+
+            else {
+                return false;
+            };
+        }
+
+        else if (LENGTH == 2) {
+
+            if (ROTATION == ROTATION_::HORIZONTAL && OVERLAP_FORBIDDEN_DETECT(LOCATION, 1, 2, 3, 4, LENGTH) == false) {
+                SMART_PLACER_POS[0] = to_string(LOCATION);
+                SMART_PLACER_POS[1] = to_string(LOCATION + 1);
+                SMART_PLACER_POS[2] = to_string(LOCATION + 2);
+                SMART_PLACER_POS[3] = to_string(LOCATION + 3);
+                SMART_PLACER_POS[4] = to_string(LOCATION + 4);
+                return true;
+            }
+
+            else if (ROTATION == ROTATION_::VERTICAL && OVERLAP_FORBIDDEN_DETECT(LOCATION, 11, 22, 33, 44, LENGTH) == false) {
+                SMART_PLACER_POS[0] = to_string(LOCATION);
+                SMART_PLACER_POS[1] = to_string(LOCATION + 11);
+                SMART_PLACER_POS[2] = to_string(LOCATION + 22);
+                SMART_PLACER_POS[3] = to_string(LOCATION + 33);
+                SMART_PLACER_POS[4] = to_string(LOCATION + 44);
+                return true;
+            }
+
+            else {
+                return false;
+            };
+        }
+
+
+
+
+        if (SHIP_NAME == "Battleship") {
+            cout << SHIP_NAME << endl;
+            for (int i = 0, inc = 0; i < 4; i++, inc += INCREMENT) {
+                BATTLESHIP_POS[i] += INCREMENT;
+                for (int a = 0; a < 5; a++) {
+                    if (LOCATION + inc == CARRIER_POS[a]) {
+                        cout << "BATTLESHIP INTERSECTS CARRIER" << endl;
+                        COLLISION = true;
+                        break;
+                    }
+                }
+                for (int b = 0; b < 3; b++) {
+                    if (LOCATION + inc == DESTROYER_POS[b]) {
+                        cout << "BATTLESHIP INTERSECTS DESTROYER" << endl;
+                        COLLISION = true;
+                        break;
+                    }
+                    else if (LOCATION + inc == SUBMARINE_POS[b]) {
+                        cout << "BATTLESHIP INTERSECTS SUBMARINE" << endl;
+                        COLLISION = true;
+                        break;
+                    }
+                }
+                for (int c = 0; c < 2; c++) {
+                    if (LOCATION + inc == PATROL_BOAT_POS[c]) {
+                        cout << "BATTLESHIP INTERSECTS PATROL BOAT" << endl;
+                        COLLISION = true;
+                        break;
+                    }
+                }
+
+                if (COLLISION == true) {
+                    break;
+                };
+            }
+        }
+        if (SHIP_NAME == "Destroyer") {
+            cout << SHIP_NAME << endl;
+            for (int i = 0, inc = 0; i < 3; i++, inc += INCREMENT) {
+
+                for (int a = 0; a < 5; a++) {
+                    if (LOCATION + inc == CARRIER_POS[a]) {
+                        cout << "DESTROYER INTERSECTS CARRIER" << endl;
+                        COLLISION = true;
+                        break;
+                    }
+                }
+
+                for (int a = 0; a < 4; a++) {
+                    if (LOCATION + inc == CARRIER_POS[a]) {
+                        cout << "DESTROYER INTERSECTS CARRIER" << endl;
+                        COLLISION = true;
+                        break;
+                    }
+                }
+
+                for (int b = 0; b < 3; b++) {                    
+                    if (LOCATION + inc == SUBMARINE_POS[b]) {
+                        cout << "DESTROYER INTERSECTS SUBMARINE" << endl;
+                        COLLISION = true;
+                        break;
+                    }
+                }
+                for (int c = 0; c < 2; c++) {
+                    if (LOCATION + inc == PATROL_BOAT_POS[c]) {
+                        cout << "DESTROYER INTERSECTS PATROL BOAT" << endl;
+                        COLLISION = true;
+                        break;
+                    }
+                }
+
+                if (COLLISION == true) {
+                    break;
+                };
+            }
+        }
+
+        if (SHIP_NAME == "Submarine") {
+            cout << SHIP_NAME << endl;
+            for (int i = 0, inc = 0; i < 3; i++, inc += INCREMENT) {
+
+                for (int a = 0; a < 5; a++) {
+                    if (LOCATION + inc == CARRIER_POS[a]) {
+                        cout << "SUBMARINE INTERSECTS CARRIER" << endl;
+                        COLLISION = true;
+                        break;
+                    }
+                }
+
+                for (int a = 0; a < 4; a++) {
+                    if (LOCATION + inc == CARRIER_POS[a]) {
+                        cout << "SUBMARINE INTERSECTS CARRIER" << endl;
+                        COLLISION = true;
+                        break;
+                    }
+                }
+
+                for (int b = 0; b < 3; b++) {
+                    if (LOCATION + inc == DESTROYER_POS[b]) {
+                        cout << "SUBMARINE INTERSECTS DESTROYER" << endl;
+                        COLLISION = true;
+                        break;
+                    }
+                }
+                for (int c = 0; c < 2; c++) {
+                    if (LOCATION + inc == PATROL_BOAT_POS[c]) {
+                        cout << "SUBMARINE INTERSECTS PATROL BOAT" << endl;
+                        COLLISION = true;
+                        break;
+                    }
+                }
+
+                if (COLLISION == true) {
+                    break;
+                };
+            }
+        }

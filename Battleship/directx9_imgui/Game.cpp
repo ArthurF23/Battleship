@@ -35,6 +35,386 @@ namespace std {
 
 	bool CLIENT::CONNECTED_TO_SERVER = false;
 
+	int GAME::POS_TO_ARR(string POS) {
+		char LETTER = POS.at(0); //Get the Letter like "C" of C-7
+		int NUM = stoi(POS.substr(2, POS.length())); //Get the Number like "7" of C-7
+
+		switch (LETTER) {
+		case 'A':
+			switch (NUM) {
+			case 1:
+				return 12;
+
+			case 2:
+				return 13;
+
+			case 3:
+				return 14;
+
+			case 4:
+				return 15;
+
+			case 5:
+				return 16;
+
+			case 6:
+				return 17;
+
+			case 7:
+				return 18;
+
+			case 8:
+				return 19;
+
+			case 9:
+				return 20;
+
+			case 10:
+				return 21;
+
+			default:
+				return -1;
+			};
+			break;
+
+		case 'B':
+			switch (NUM) {
+			case 1:
+				return 23;
+
+			case 2:
+				return 24;
+
+			case 3:
+				return 25;
+
+			case 4:
+				return 26;
+
+			case 5:
+				return 27;
+
+			case 6:
+				return 28;
+
+			case 7:
+				return 29;
+
+			case 8:
+				return 30;
+
+			case 9:
+				return 31;
+
+			case 10:
+				return 32;
+
+			default:
+				return -1;
+			};
+			break;
+
+		case 'C':
+			switch (NUM) {
+			case 1:
+				return 34;
+
+			case 2:
+				return 35;
+
+			case 3:
+				return 36;
+
+			case 4:
+				return 37;
+
+			case 5:
+				return 38;
+
+			case 6:
+				return 39;
+
+			case 7:
+				return 40;
+
+			case 8:
+				return 41;
+
+			case 9:
+				return 42;
+
+			case 10:
+				return 43;
+
+			default:
+				return -1;
+			};
+			break;
+
+		case 'D':
+			switch (NUM) {
+			case 1:
+				return 45;
+
+			case 2:
+				return 46;
+
+			case 3:
+				return 47;
+
+			case 4:
+				return 48;
+
+			case 5:
+				return 49;
+
+			case 6:
+				return 50;
+
+			case 7:
+				return 51;
+
+			case 8:
+				return 52;
+
+			case 9:
+				return 53;
+
+			case 10:
+				return 54;
+
+			default:
+				return -1;
+			};
+			break;
+
+		case 'E':
+			switch (NUM) {
+			case 1:
+				return 56;
+
+			case 2:
+				return 57;
+
+			case 3:
+				return 58;
+
+			case 4:
+				return 59;
+
+			case 5:
+				return 60;
+
+			case 6:
+				return 61;
+
+			case 7:
+				return 62;
+
+			case 8:
+				return 63;
+
+			case 9:
+				return 64;
+
+			case 10:
+				return 65;
+
+			default:
+				return -1;
+			};
+			break;
+
+		case 'F':
+			switch (NUM) {
+			case 1:
+				return 67;
+
+			case 2:
+				return 68;
+
+			case 3:
+				return 69;
+
+			case 4:
+				return 70;
+
+			case 5:
+				return 71;
+
+			case 6:
+				return 72;
+
+			case 7:
+				return 73;
+
+			case 8:
+				return 74;
+
+			case 9:
+				return 75;
+
+			case 10:
+				return 76;
+
+			default:
+				return -1;
+			};
+			break;
+
+		case 'G':
+			switch (NUM) {
+			case 1:
+				return 78;
+
+			case 2:
+				return 79;
+
+			case 3:
+				return 80;
+
+			case 4:
+				return 81;
+
+			case 5:
+				return 82;
+
+			case 6:
+				return 83;
+
+			case 7:
+				return 84;
+
+			case 8:
+				return 85;
+
+			case 9:
+				return 86;
+
+			case 10:
+				return 87;
+
+			default:
+				return -1;
+			};
+			break;
+
+		case 'H':
+			switch (NUM) {
+			case 1:
+				return 89;
+
+			case 2:
+				return 90;
+
+			case 3:
+				return 91;
+
+			case 4:
+				return 92;
+
+			case 5:
+				return 93;
+
+			case 6:
+				return 94;
+
+			case 7:
+				return 95;
+
+			case 8:
+				return 96;
+
+			case 9:
+				return 97;
+
+			case 10:
+				return 98;
+
+			default:
+				return -1;
+			};
+			break;
+
+		case 'I':
+			switch (NUM) {
+			case 1:
+				return 100;
+
+			case 2:
+				return 101;
+
+			case 3:
+				return 102;
+
+			case 4:
+				return 103;
+
+			case 5:
+				return 104;
+
+			case 6:
+				return 105;
+
+			case 7:
+				return 106;
+
+			case 8:
+				return 107;
+
+			case 9:
+				return 108;
+
+			case 10:
+				return 109;
+
+			default:
+				return -1;
+			};
+			break;
+
+		case 'J':
+			switch (NUM) {
+			case 1:
+				return 111;
+
+			case 2:
+				return 112;
+
+			case 3:
+				return 113;
+
+			case 4:
+				return 114;
+
+			case 5:
+				return 115;
+
+			case 6:
+				return 116;
+
+			case 7:
+				return 117;
+
+			case 8:
+				return 118;
+
+			case 9:
+				return 119;
+
+			case 10:
+				return 120;
+
+			default:
+				return -1;
+			};
+			break;
+		default:
+			return -1;
+		};
+
+	};
+
 	int SERVER::START() {
 		// Initialize winsock
 #ifdef _WIN32
@@ -255,7 +635,7 @@ namespace std {
 	int SERVER::SEND(string data) {
 		send(clientSocket, data.c_str(), data.length() + 1, 0);
 		return 0;
-	}
+	};
 
 	int CLIENT::START(string ip) {
 		// Create a hint structure for the server we are connecting with
