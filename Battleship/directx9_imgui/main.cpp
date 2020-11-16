@@ -110,6 +110,14 @@ struct PLAYER_RADAR {
     int Y = 0;
 };
 
+struct INFO_WINDOW {
+    int WIDTH = ImGui::GetIO().DisplaySize.x - PLAYER_RADAR().WIDTH;
+    int HEIGHT = ImGui::GetIO().DisplaySize.y - PLAYER_RADAR().HEIGHT;
+
+    int X = 0;
+    int Y = PLAYER_RADAR().HEIGHT + 10;
+};
+
 struct COLOR {
     ImVec4 HIT = ImVec4(255.0f, 0.0f, 0.0f, 1.0f);
     ImVec4 MISS = ImVec4(0.255f, 0.255f, 0.255f, 1.0f);
@@ -454,6 +462,7 @@ struct CARRIER_ {
     int LOCATION[LENGTH];
     bool IS_DESTROYED = false;
     bool HOLES_HIT[LENGTH] = { false, false, false, false, false };
+    bool SUNK_DISPLAYED = false;
 
     bool CHECK_SUNK() {
         int counter = 0;
@@ -482,6 +491,7 @@ struct BATTLESHIP_ {
     int LOCATION[LENGTH];
     bool IS_DESTROYED = false;
     bool HOLES_HIT[LENGTH] = { false, false, false, false };
+    bool SUNK_DISPLAYED = false;
 
     bool CHECK_SUNK() {
         int counter = 0;
@@ -509,6 +519,7 @@ struct DESTROYER_ {
     int LOCATION[LENGTH];
     bool IS_DESTROYED = false;
     bool HOLES_HIT[LENGTH] = { false, false, false };
+    bool SUNK_DISPLAYED = false;
 
     bool CHECK_SUNK() {
         int counter = 0;
@@ -537,6 +548,7 @@ struct SUBMARINE_ {
     int LOCATION[LENGTH];
     bool IS_DESTROYED = false;
     bool HOLES_HIT[LENGTH] = { false, false, false };
+    bool SUNK_DISPLAYED = false;
 
     bool CHECK_SUNK() {
         int counter = 0;
@@ -564,6 +576,7 @@ struct PATROL_BOAT_ {
     int LOCATION[LENGTH] = { 0, 0 };
     bool IS_DESTROYED = false;
     bool HOLES_HIT[LENGTH] = { false, false };
+    bool SUNK_DISPLAYED = false;
 
     bool CHECK_SUNK() {
         int counter = 0;
@@ -677,35 +690,36 @@ public:
 
         //Check to see if anything is sunk...
         //Carrier
-        if (PTR->SHIPS->CARRIER->CHECK_SUNK() == true) {
+        if (PTR->SHIPS->CARRIER->CHECK_SUNK() == true && PTR->SHIPS->CARRIER->SUNK_DISPLAYED != true) {
             for (int i = 0; i < 5; i++) {
                 PTR->FLEET[PTR->SHIPS->CARRIER->LOCATION[i]]->STATE = PTR->FLEET[PTR->SHIPS->CARRIER->LOCATION[i]]->STATE_::SUNK;
             };
             return PTR->SHIPS->CARRIER->LOCATION[0];
         };
         //Battleship
-        if (PTR->SHIPS->BATTLESHIP->CHECK_SUNK() == true) {
+        if (PTR->SHIPS->BATTLESHIP->CHECK_SUNK() == true && PTR->SHIPS->BATTLESHIP->SUNK_DISPLAYED != true) {
             for (int i = 0; i < 4; i++) {
                 PTR->FLEET[PTR->SHIPS->BATTLESHIP->LOCATION[i]]->STATE = PTR->FLEET[PTR->SHIPS->BATTLESHIP->LOCATION[i]]->STATE_::SUNK;
             };
             return PTR->SHIPS->BATTLESHIP->LOCATION[0];
         };
         //Destroyer
-        if (PTR->SHIPS->DESTROYER->CHECK_SUNK() == true) {
+        if (PTR->SHIPS->DESTROYER->CHECK_SUNK() == true && PTR->SHIPS->DESTROYER->SUNK_DISPLAYED != true) {
             for (int i = 0; i < 3; i++) {
                 PTR->FLEET[PTR->SHIPS->DESTROYER->LOCATION[i]]->STATE = PTR->FLEET[PTR->SHIPS->DESTROYER->LOCATION[i]]->STATE_::SUNK;
             };
             return PTR->SHIPS->DESTROYER->LOCATION[0];
         };
         //Submarine
-        if (PTR->SHIPS->SUBMARINE->CHECK_SUNK() == true) {
+        if (PTR->SHIPS->SUBMARINE->CHECK_SUNK() == true && PTR->SHIPS->SUBMARINE->SUNK_DISPLAYED != true) {
             for (int i = 0; i < 3; i++) {
                 PTR->FLEET[PTR->SHIPS->SUBMARINE->LOCATION[i]]->STATE = PTR->FLEET[PTR->SHIPS->SUBMARINE->LOCATION[i]]->STATE_::SUNK;
             };
             return PTR->SHIPS->SUBMARINE->LOCATION[0];
         };
         //Patrol Boat
-        if (PTR->SHIPS->PATROL_BOAT->CHECK_SUNK() == true) {
+        if (PTR->SHIPS->PATROL_BOAT->CHECK_SUNK() == true && PTR->SHIPS->PATROL_BOAT->SUNK_DISPLAYED != true) {
+            PTR->SHIPS->PATROL_BOAT->SUNK_DISPLAYED = true;
             for (int i = 0; i < 2; i++) {
                 PTR->FLEET[PTR->SHIPS->PATROL_BOAT->LOCATION[i]]->STATE = PTR->FLEET[PTR->SHIPS->PATROL_BOAT->LOCATION[i]]->STATE_::SUNK;
             };
@@ -1299,6 +1313,7 @@ int main(int, char**)
     system("cls");
     if (is_host == true) {
         do {
+            system("ipconfig");
             cout << "Waiting for connection";
             Sleep(1000);
             cout << ".";
@@ -1437,10 +1452,6 @@ int main(int, char**)
         ImGui::PushStyleColor(ImGuiCol_ResizeGripActive, STYLE().color_active);
         */
 
-        // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-        if (show_demo_window == false)
-            ImGui::ShowDemoWindow(&show_demo_window);
-
         //Player's fleet show_game_window == true && show_config_window == false && 
         if (show_game_window == true && show_config_window == false && SERVER::IS_STARTED == true && CLIENT::IS_STARTED == true) {
             static float f = 0.0f;
@@ -1508,6 +1519,21 @@ int main(int, char**)
             ImGui::End();
         }
 
+        //Turn Window
+        if (show_game_window == true && show_config_window == false && SERVER::IS_STARTED == true && CLIENT::IS_STARTED == true) {
+            ImGui::SetNextWindowPos(ImVec2(INFO_WINDOW().X, INFO_WINDOW().Y));
+            ImGui::SetNextWindowSize(ImVec2(INFO_WINDOW().WIDTH, INFO_WINDOW().HEIGHT));
+            ImGui::Begin("Info", (bool*)false, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+            string TURN;
+            if (POINTER->is_turn == true) {
+                TURN = "Your turn...";
+            }
+            else {
+                TURN = ENEMY_POINTER->name + "'s turn...";
+            };
+            ImGui::Text(TURN.c_str());
+            ImGui::End();
+        };
 
         //Radar
         if (show_game_window == true && show_config_window == false && SERVER::IS_STARTED == true && CLIENT::IS_STARTED == true) {
