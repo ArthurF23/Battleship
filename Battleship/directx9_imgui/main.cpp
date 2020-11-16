@@ -688,6 +688,13 @@ public:
             PTR->SHIPS->PATROL_BOAT->HOLES_HIT[PTR->FLEET[arr_pos]->SHIP_CHUNK] = true;
         }
 
+        //Check Gameover...
+        if (PTR->SHIPS->CARRIER->CHECK_SUNK() == true && PTR->SHIPS->BATTLESHIP->CHECK_SUNK() == true &&
+            PTR->SHIPS->DESTROYER->CHECK_SUNK() == true && PTR->SHIPS->SUBMARINE->CHECK_SUNK() == true &&
+            PTR->SHIPS->PATROL_BOAT->CHECK_SUNK() == true) {
+            PTR->LOST = true;
+            return -1;
+        }
         //Check to see if anything is sunk...
         //Carrier
         if (PTR->SHIPS->CARRIER->CHECK_SUNK() == true && PTR->SHIPS->CARRIER->SUNK_DISPLAYED != true) {
@@ -741,7 +748,10 @@ public:
                 cout << "HIT" << endl;
                 PTR->FLEET[arr_pos]->STATE = PTR->FLEET[arr_pos]->STATE_::HIT;
                 int update_ships = PTR->UPDATE_SHIP(PTR, arr_pos);
-                if (update_ships == 0) {
+                if (update_ships == -1) {
+                    SERVER::SEND("R@LOST");
+                }
+                else if (update_ships == 0) {
                     SERVER::SEND("R@HIT" + to_string(arr_pos));
                 }
                 else {
@@ -818,12 +828,15 @@ public:
                 cout << "HIT" << endl;
                 PTR->FLEET[arr_pos]->STATE = PTR->FLEET[arr_pos]->STATE_::HIT;
                 int update_ships = PTR->UPDATE_SHIP(PTR, arr_pos);
-                if (update_ships == 0) {
+                if (update_ships == -1) {
+                    CLIENT::SEND("R@LOST");
+                }
+                else if (update_ships == 0) {
                     CLIENT::SEND("R@HIT" + to_string(arr_pos));
                 }
                 else {
-                    int length;
-                    string rotation;
+                    int length; //Length of ship 
+                    string rotation; //Rotation of ship
                     string name = PTR->FLEET[arr_pos]->SHIP_NAME;
                     if (name == "Carrier") {
                         length = 5;
@@ -887,7 +900,7 @@ public:
         PTR->is_turn = true;
     }
 
-    void BUTTON_FUNC(string BTN, int arrL, PLAYER* PTR) {
+    void BUTTON_FUNC(string BTN, int arrL, PLAYER* PTR, PLAYER* E_PTR) {
         bool is_forbidden = false;
         for (int i = 0; i < 21; i++) {
             if (arrL == RADAR[arrL]->FORBIDDEN_BUTTONS[i]) {
@@ -916,6 +929,10 @@ public:
                     int index = stoi(SERVER::RECENTMESSAGE.substr(6, SERVER::RECENTMESSAGE.length()));
                     RADAR[index]->STATE = RADAR[index]->STATE_::MISS;
                     RADAR[index]->ID += "\nMISS";
+                }
+
+                else if (SERVER::RECENTMESSAGE.substr(0, 6) == "R@LOST") {
+                    E_PTR->LOST = true;
                 }
 
 
@@ -1226,6 +1243,7 @@ int setup() {
     if (inp == 'j') {
         system("cls");
         cout << "What is the ip address of the host?" << endl;
+        //192.168.86.195
         cin >> IP;
         return 0;
     }
@@ -1451,6 +1469,35 @@ int main(int, char**)
         ImGui::PushStyleColor(ImGuiCol_ResizeGripActive, STYLE().color_active);
         */
 
+        if (POINTER->LOST == true || ENEMY_POINTER->LOST == true) {
+            ImGui::Begin("Gameover", (bool*)false, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+            string TEXT;
+            if (POINTER->LOST == true) {
+                TEXT = "You lost...";
+            }
+            else {
+                TEXT = ENEMY_POINTER->name + " lost...";
+            }
+            ImGui::Text(TEXT.c_str());
+            ImGui::End();
+        }
+
+        //Turn Window
+        if (show_game_window == true && show_config_window == false && SERVER::IS_STARTED == true && CLIENT::IS_STARTED == true && POINTER->LOST == false && ENEMY_POINTER->LOST == false) {
+            ImGui::SetNextWindowPos(ImVec2(INFO_WINDOW().X, INFO_WINDOW().Y));
+            ImGui::SetNextWindowSize(ImVec2(INFO_WINDOW().WIDTH, INFO_WINDOW().HEIGHT));
+            ImGui::Begin("Info", (bool*)false, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+            string TURN;
+            if (POINTER->is_turn == true) {
+                TURN = "Your turn...";
+            }
+            else {
+                TURN = ENEMY_POINTER->name + "'s turn...";
+            };
+            ImGui::Text(TURN.c_str());
+            ImGui::End();
+        };
+
         //Player's fleet show_game_window == true && show_config_window == false && 
         if (show_game_window == true && show_config_window == false && SERVER::IS_STARTED == true && CLIENT::IS_STARTED == true) {
             static float f = 0.0f;
@@ -1517,25 +1564,9 @@ int main(int, char**)
             };
             ImGui::End();
         }
-
-        //Turn Window
-        if (show_game_window == true && show_config_window == false && SERVER::IS_STARTED == true && CLIENT::IS_STARTED == true) {
-            ImGui::SetNextWindowPos(ImVec2(INFO_WINDOW().X, INFO_WINDOW().Y));
-            ImGui::SetNextWindowSize(ImVec2(INFO_WINDOW().WIDTH, INFO_WINDOW().HEIGHT));
-            ImGui::Begin("Info", (bool*)false, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
-            string TURN;
-            if (POINTER->is_turn == true) {
-                TURN = "Your turn...";
-            }
-            else {
-                TURN = ENEMY_POINTER->name + "'s turn...";
-            };
-            ImGui::Text(TURN.c_str());
-            ImGui::End();
-        };
-
+        
         //Radar
-        if (show_game_window == true && show_config_window == false && SERVER::IS_STARTED == true && CLIENT::IS_STARTED == true) {
+        if (show_game_window == true && show_config_window == false && SERVER::IS_STARTED == true && CLIENT::IS_STARTED == true && POINTER->LOST == false && ENEMY_POINTER->LOST == false) {
         ImGui::SetNextWindowPos(ImVec2(PLAYER_RADAR().X, PLAYER_RADAR().Y));
         ImGui::SetNextWindowSize(ImVec2(PLAYER_RADAR().WIDTH, PLAYER_RADAR().HEIGHT));
 
@@ -1609,7 +1640,7 @@ int main(int, char**)
                     ImGui::PushStyleColor(ImGuiCol_ButtonActive, COLOR().DEFAULT);
                     if (ImGui::Button(name.c_str(), POINTER->RADAR[i]->SIZE)) {
                         if (POINTER->is_turn == true) {
-                            POINTER->BUTTON_FUNC(POINTER->RADAR[i]->ID, i, POINTER);          
+                            POINTER->BUTTON_FUNC(POINTER->RADAR[i]->ID, i, POINTER, ENEMY_POINTER);          
                         }
                     };
                     ImGui::PopStyleColor();
@@ -1622,7 +1653,7 @@ int main(int, char**)
         }
 
         //Waiting window
-        if (show_game_window == true && show_config_window == false && (SERVER::IS_STARTED == false || CLIENT::IS_STARTED == false)) {
+        if (show_game_window == true && show_config_window == false && (SERVER::IS_STARTED == false || CLIENT::IS_STARTED == false) && POINTER->LOST == false && ENEMY_POINTER->LOST == false) {
             ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x / 2, (ImGui::GetIO().DisplaySize.y / 2) - 100));
             ImGui::SetNextWindowSize(ImVec2(400, 100));
 
