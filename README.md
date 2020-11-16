@@ -1,2 +1,2 @@
 # Battleship
-Currently writing the basic code
+Battleship in C-- using ImGui
