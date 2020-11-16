@@ -701,47 +701,34 @@ namespace std {
 
 		// Do-while loop to send and recieve data
 		char buf[4096] = "";
-		std::string userInput;
-
+		std::string userInput = " ";
 #ifdef _WIN32
-		do
+		while (true)
 		{
-			// Prompt the user for some text
-			std::cout << "> ";
-			std::cin >> userInput;
-			if (userInput.size() > 0) // Make sure the user has typed something
+			// Wait for response
+			ZeroMemory(buf, 4096);
+			int bytesReceived = recv(sock, buf, 4096, 0);
+			if (bytesReceived > 0)
 			{
-				// Send the text
-				int sendResult = send(sock, userInput.c_str(), userInput.size() + 1, 0);
-				if (sendResult != SOCKET_ERROR)
-				{
-					// Wait for response
-					ZeroMemory(buf, 4096);
-					int bytesReceived = recv(sock, buf, 4096, 0);
-					if (bytesReceived > 0)
-					{
-						// Echo response to console
-						std::cout << "SERVER> " << std::string(buf, 0, bytesReceived) << '\n';
-					}
-					string s;
-					stringstream ss;
-					ss << buf;
+				// Echo response to console
+				std::cout << "SERVER> " << std::string(buf, 0, bytesReceived) << '\n';
+			}
+			string s;
+			stringstream ss;
+			ss << buf;
 
-					ss >> s;
-					if (s.substr(0, 5) == "START") {
-						cout << "STARTING..." << endl;
-						SERVER::IS_STARTED = true;
-					}
-
-					else if (s.substr(0, 5) == "NAME:") {
-						cout << "NAME RECIVED" << endl;
-					}
-				}
+			ss >> s;
+			CLIENT::RECENTMESSAGE = s;
+			cout << s << endl;
+			if (s.substr(0, 5) == "START") {
+				cout << "STARTING..." << endl;
+				SERVER::IS_STARTED = true;
 			}
 
-		} while (userInput.size() > 0);
-
-		cout << "0 bytes" << endl;
+			else if (s.substr(0, 5) == "NAME:") {
+				cout << "NAME RECIVED" << endl;
+			}
+		}
 
 #else
 		do

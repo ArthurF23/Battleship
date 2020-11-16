@@ -651,7 +651,7 @@ public:
     FLEET_* FLEET[120];
 
 
-    static void UPDATE_SHIP(PLAYER* PTR, int arr_pos) {
+    static int UPDATE_SHIP(PLAYER* PTR, int arr_pos) {
         //Update the holes hit...
 
         //Carrier
@@ -681,31 +681,38 @@ public:
             for (int i = 0; i < 5; i++) {
                 PTR->FLEET[PTR->SHIPS->CARRIER->LOCATION[i]]->STATE = PTR->FLEET[PTR->SHIPS->CARRIER->LOCATION[i]]->STATE_::SUNK;
             };
+            return PTR->SHIPS->CARRIER->LOCATION[0];
         };
         //Battleship
         if (PTR->SHIPS->BATTLESHIP->CHECK_SUNK() == true) {
             for (int i = 0; i < 4; i++) {
                 PTR->FLEET[PTR->SHIPS->BATTLESHIP->LOCATION[i]]->STATE = PTR->FLEET[PTR->SHIPS->BATTLESHIP->LOCATION[i]]->STATE_::SUNK;
             };
+            return PTR->SHIPS->BATTLESHIP->LOCATION[0];
         };
         //Destroyer
         if (PTR->SHIPS->DESTROYER->CHECK_SUNK() == true) {
             for (int i = 0; i < 3; i++) {
                 PTR->FLEET[PTR->SHIPS->DESTROYER->LOCATION[i]]->STATE = PTR->FLEET[PTR->SHIPS->DESTROYER->LOCATION[i]]->STATE_::SUNK;
             };
+            return PTR->SHIPS->DESTROYER->LOCATION[0];
         };
         //Submarine
         if (PTR->SHIPS->SUBMARINE->CHECK_SUNK() == true) {
             for (int i = 0; i < 3; i++) {
                 PTR->FLEET[PTR->SHIPS->SUBMARINE->LOCATION[i]]->STATE = PTR->FLEET[PTR->SHIPS->SUBMARINE->LOCATION[i]]->STATE_::SUNK;
             };
+            return PTR->SHIPS->SUBMARINE->LOCATION[0];
         };
         //Patrol Boat
         if (PTR->SHIPS->PATROL_BOAT->CHECK_SUNK() == true) {
             for (int i = 0; i < 2; i++) {
                 PTR->FLEET[PTR->SHIPS->PATROL_BOAT->LOCATION[i]]->STATE = PTR->FLEET[PTR->SHIPS->PATROL_BOAT->LOCATION[i]]->STATE_::SUNK;
             };
+            return PTR->SHIPS->PATROL_BOAT->LOCATION[0];
         };
+
+        return 0;
     };
 
     static void WAIT_TURN(PLAYER* PTR) {
@@ -718,17 +725,148 @@ public:
 
             if (PTR->FLEET[arr_pos]->STATE == PTR->FLEET[arr_pos]->STATE_::BOAT) {
                 cout << "HIT" << endl;
-                SERVER::SEND("R@HIT" + to_string(arr_pos));
                 PTR->FLEET[arr_pos]->STATE = PTR->FLEET[arr_pos]->STATE_::HIT;
-                SERVER::RECENTMESSAGE = "";
+                int update_ships = PTR->UPDATE_SHIP(PTR, arr_pos);
+                if (update_ships == 0) {
+                    SERVER::SEND("R@HIT" + to_string(arr_pos));
+                }
+                else {
+                    cout << "SUNK" << endl;
+                    int length;
+                    string rotation;
+                    string name = PTR->FLEET[arr_pos]->SHIP_NAME;
+                    if (name == "Carrier") {
+                        length = 5;
+                        if (PTR->SHIPS->CARRIER->PLACER->ROTATION == PTR->SHIPS->CARRIER->PLACER->ROTATION_::HORIZONTAL) {
+                            rotation = "H";
+                        }
+                        else {
+                            rotation = "V";
+                        };
+                    }
+                    else if (name == "Battleship") {
+                        length = 4;
+                        if (PTR->SHIPS->BATTLESHIP->PLACER->ROTATION == PTR->SHIPS->BATTLESHIP->PLACER->ROTATION_::HORIZONTAL) {
+                            rotation = "H";
+                        }
+                        else {
+                            rotation = "V";
+                        };
+                    }
+                    else if (name == "Destroyer") {
+                        length = 3;
+                        if (PTR->SHIPS->DESTROYER->PLACER->ROTATION == PTR->SHIPS->DESTROYER->PLACER->ROTATION_::HORIZONTAL) {
+                            rotation = "H";
+                        }
+                        else {
+                            rotation = "V";
+                        };
+                    }
+                    else if (name == "Submarine") {
+                        length = 3;
+                        if (PTR->SHIPS->SUBMARINE->PLACER->ROTATION == PTR->SHIPS->SUBMARINE->PLACER->ROTATION_::HORIZONTAL) {
+                            rotation = "H";
+                        }
+                        else {
+                            rotation = "V";
+                        };
+                    }
+                    else {
+                        length = 2;
+                        if (PTR->SHIPS->PATROL_BOAT->PLACER->ROTATION == PTR->SHIPS->PATROL_BOAT->PLACER->ROTATION_::HORIZONTAL) {
+                            rotation = "H";
+                        }
+                        else {
+                            rotation = "V";
+                        };
+                    }
+                    SERVER::SEND("R@SUNK@" + rotation + to_string(length) + to_string(update_ships));
+                }                
+            }
 
+            else if (PTR->FLEET[arr_pos]->STATE == PTR->FLEET[arr_pos]->STATE_::UNCLICKED) {
+                cout << "MISS" << endl;
+                SERVER::SEND("R@MISS" + to_string(arr_pos));
+                PTR->FLEET[arr_pos]->STATE = PTR->FLEET[arr_pos]->STATE_::MISS;
                 PTR->UPDATE_SHIP(PTR, arr_pos);
             }
+
+            SERVER::RECENTMESSAGE = "";
         }
         else {
             do {
                 Sleep(1000);
-            } while (CLIENT::RECENTMESSAGE.substr(0, 1) != "F@");
+            } while (CLIENT::RECENTMESSAGE.substr(0, 2) != "F@");
+            cout << CLIENT::RECENTMESSAGE.substr(2, CLIENT::RECENTMESSAGE.length()) << endl;
+            int arr_pos = stoi(CLIENT::RECENTMESSAGE.substr(2, CLIENT::RECENTMESSAGE.length()));
+
+            if (PTR->FLEET[arr_pos]->STATE == PTR->FLEET[arr_pos]->STATE_::BOAT) {
+                cout << "HIT" << endl;
+                PTR->FLEET[arr_pos]->STATE = PTR->FLEET[arr_pos]->STATE_::HIT;
+                int update_ships = PTR->UPDATE_SHIP(PTR, arr_pos);
+                if (update_ships == 0) {
+                    CLIENT::SEND("R@HIT" + to_string(arr_pos));
+                }
+                else {
+                    int length;
+                    string rotation;
+                    string name = PTR->FLEET[arr_pos]->SHIP_NAME;
+                    if (name == "Carrier") {
+                        length = 5;
+                        if (PTR->SHIPS->CARRIER->PLACER->ROTATION == PTR->SHIPS->CARRIER->PLACER->ROTATION_::HORIZONTAL) {
+                            rotation = "H";
+                        }
+                        else {
+                            rotation = "V";
+                        };
+                    }
+                    else if (name == "Battleship") {
+                        length = 4;
+                        if (PTR->SHIPS->BATTLESHIP->PLACER->ROTATION == PTR->SHIPS->BATTLESHIP->PLACER->ROTATION_::HORIZONTAL) {
+                            rotation = "H";
+                        }
+                        else {
+                            rotation = "V";
+                        };
+                    }
+                    else if (name == "Destroyer") {
+                        length = 3;
+                        if (PTR->SHIPS->DESTROYER->PLACER->ROTATION == PTR->SHIPS->DESTROYER->PLACER->ROTATION_::HORIZONTAL) {
+                            rotation = "H";
+                        }
+                        else {
+                            rotation = "V";
+                        };
+                    }
+                    else if (name == "Submarine") {
+                        length = 3;
+                        if (PTR->SHIPS->SUBMARINE->PLACER->ROTATION == PTR->SHIPS->SUBMARINE->PLACER->ROTATION_::HORIZONTAL) {
+                            rotation = "H";
+                        }
+                        else {
+                            rotation = "V";
+                        };
+                    }
+                    else {
+                        length = 2;
+                        if (PTR->SHIPS->PATROL_BOAT->PLACER->ROTATION == PTR->SHIPS->PATROL_BOAT->PLACER->ROTATION_::HORIZONTAL) {
+                            rotation = "H";
+                        }
+                        else {
+                            rotation = "V";
+                        };
+                    }
+                    CLIENT::SEND("R@SUNK@" + rotation + to_string(length) + to_string(update_ships));
+                }
+            }
+
+            else if (PTR->FLEET[arr_pos]->STATE == PTR->FLEET[arr_pos]->STATE_::UNCLICKED) {
+                cout << "MISS" << endl;
+                CLIENT::SEND("R@MISS" + to_string(arr_pos));
+                PTR->FLEET[arr_pos]->STATE = PTR->FLEET[arr_pos]->STATE_::MISS;
+                PTR->UPDATE_SHIP(PTR, arr_pos);
+            }
+            CLIENT::RECENTMESSAGE = "";
         }
 
 
@@ -768,18 +906,30 @@ public:
 
 
                 else if (SERVER::RECENTMESSAGE.substr(0, 6) == "R@SUNK") {
-                    //int index = stoi(SERVER::RECENTMESSAGE.substr(6, SERVER::RECENTMESSAGE.length()));
+                    //Decode key// roatation = @V and @H defines if vertical or horizontal
+                    //R@SUNK@{rotation}{length}{location} // R@SUNK@H0521 // @H0521
+                    int increment;
                     string msg = SERVER::RECENTMESSAGE.substr(6, SERVER::RECENTMESSAGE.length());
-                    int begin = 0;
-                    int locations[5];
-                    for (int i = 0; i < msg.length(); i++) {
-                        if (msg.at(i) == ':') {
+                    string rotation = msg.substr(0, 2);
 
-                        }
+                    string length_and_location = msg.substr(2, 3);
+                    int length_of_sunk = stoi(length_and_location.substr(0, 1));
+                    int location_of_sunk = stoi(length_and_location.substr(1, length_and_location.length()));
+                    cout << "message = " << SERVER::RECENTMESSAGE << " rotation = " << rotation << " length = " << length_of_sunk << " location = " << location_of_sunk << endl;
+
+                    if (rotation == "@V") {
+                        increment = 11;
                     }
-                    //RADAR[index]->STATE = RADAR[index]->STATE_::SUNK;
-                    //RADAR[index]->ID += "\nSUNK";
-                }
+
+                    else if (rotation == "@H") {
+                        increment = 1;
+                    };
+
+                    for (int i = 0, inc = location_of_sunk; i < length_of_sunk; i++, inc += increment) {
+                        PTR->RADAR[inc]->STATE = PTR->RADAR[inc]->STATE_::SUNK;
+                    };
+
+                };
                 SERVER::RECENTMESSAGE = "";
                 is_turn = false;
                 SERVER::SEND("TURN");
@@ -798,26 +948,49 @@ public:
                     int index = stoi(CLIENT::RECENTMESSAGE.substr(5, CLIENT::RECENTMESSAGE.length()));
                     RADAR[index]->STATE = RADAR[index]->STATE_::HIT;
                     RADAR[index]->ID += "\nHIT";
-                    CLIENT::RECENTMESSAGE = "";
                 }
 
                 else if (CLIENT::RECENTMESSAGE.substr(0, 6) == "R@MISS") {
                     int index = stoi(CLIENT::RECENTMESSAGE.substr(6, CLIENT::RECENTMESSAGE.length()));
                     RADAR[index]->STATE = RADAR[index]->STATE_::MISS;
                     RADAR[index]->ID += "\nMISS";
-                    CLIENT::RECENTMESSAGE = "";
                 }
 
+
                 else if (CLIENT::RECENTMESSAGE.substr(0, 6) == "R@SUNK") {
-                    int index = stoi(CLIENT::RECENTMESSAGE.substr(6, CLIENT::RECENTMESSAGE.length()));
-                    RADAR[index]->STATE = RADAR[index]->STATE_::SUNK;
-                    RADAR[index]->ID += "\nSUNK";
-                    CLIENT::RECENTMESSAGE = "";
-                }
+                    //Decode key// roatation = @V and @H defines if vertical or horizontal
+                    //R@SUNK@{rotation}{length}{location} // R@SUNK@H0521 // @H0521
+                    int increment;
+                    string msg = CLIENT::RECENTMESSAGE.substr(6, CLIENT::RECENTMESSAGE.length());
+                    string rotation = msg.substr(0, 2);
+
+                    string length_and_location = msg.substr(2, 3);
+                    int length_of_sunk = stoi(length_and_location.substr(0, 1));
+                    int location_of_sunk = stoi(length_and_location.substr(1, length_and_location.length()));
+                    cout << "message = " << CLIENT::RECENTMESSAGE << " rotation = " << rotation << " length = " << length_of_sunk << " location = " << location_of_sunk << endl;
+
+                    if (rotation == "@V") {
+                        increment = 11;
+                    }
+
+                    else if (rotation == "@H") {
+                        increment = 1;
+                    };
+
+                    for (int i = 0, inc = location_of_sunk; i < length_of_sunk; i++, inc += increment) {
+                        PTR->RADAR[inc]->STATE = PTR->RADAR[inc]->STATE_::SUNK;
+                    };
+
+                };
+                CLIENT::RECENTMESSAGE = "";
+                is_turn = false;
+                CLIENT::SEND("TURN");
+                //thread T(WAIT_TURN, PTR);
+                //T.join();
                 //is_turn = false;
             }
         };        
-    }
+    };
 
     void GENERATE_RADAR() {
         string LETTERS[10] = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" };
@@ -1079,9 +1252,14 @@ void get_name() {
         cout << "Player 2 name: " << PLAYER_2->name << endl;
     }
     else {
+        int inc = 0;
         CLIENT::SEND("NAME:" + POINTER->name);
         do {
+            inc++;
             Sleep(1000);
+            if (inc == 30) {
+                break;
+            };
         } while (CLIENT::RECENTMESSAGE == "");
 
         PLAYER_2->name = CLIENT::RECENTMESSAGE.substr(5, CLIENT::RECENTMESSAGE.length());
@@ -1286,11 +1464,7 @@ int main(int, char**)
                         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, COLOR().HIT);
                         ImGui::PushStyleColor(ImGuiCol_ButtonActive, COLOR().HIT);
 
-                        if (ImGui::Button(name.c_str(), POINTER->FLEET[i]->SIZE)) {
-                            if (POINTER->is_turn == true) {
-                                POINTER->BUTTON_FUNC(POINTER->FLEET[i]->ID, i, POINTER);
-                            }
-                        };
+                        if (ImGui::Button(name.c_str(), POINTER->FLEET[i]->SIZE)) {};
                         ImGui::PopStyleColor();
                     }
 
@@ -1299,11 +1473,7 @@ int main(int, char**)
                         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, COLOR().MISS);
                         ImGui::PushStyleColor(ImGuiCol_ButtonActive, COLOR().MISS);
 
-                        if (ImGui::Button(name.c_str(), POINTER->FLEET[i]->SIZE)) {
-                            if (POINTER->is_turn == true) {
-                                POINTER->BUTTON_FUNC(POINTER->FLEET[i]->ID, i, POINTER);
-                            }
-                        };
+                        if (ImGui::Button(name.c_str(), POINTER->FLEET[i]->SIZE)) {};
                         ImGui::PopStyleColor();
                     }
 
@@ -1312,11 +1482,7 @@ int main(int, char**)
                         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, COLOR().BOAT);
                         ImGui::PushStyleColor(ImGuiCol_ButtonActive, COLOR().BOAT);
 
-                        if (ImGui::Button(name.c_str(), POINTER->FLEET[i]->SIZE)) {
-                            if (POINTER->is_turn == true) {
-                                POINTER->BUTTON_FUNC(POINTER->FLEET[i]->ID, i, POINTER);
-                            }
-                        };
+                        if (ImGui::Button(name.c_str(), POINTER->FLEET[i]->SIZE)) {};
                         ImGui::PopStyleColor();
                     }
 
@@ -1325,11 +1491,7 @@ int main(int, char**)
                         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, COLOR().SUNK);
                         ImGui::PushStyleColor(ImGuiCol_ButtonActive, COLOR().SUNK);
 
-                        if (ImGui::Button(name.c_str(), POINTER->FLEET[i]->SIZE)) {
-                            if (POINTER->is_turn == true) {
-                                //POINTER->BUTTON_FUNC(POINTER->RADAR[i]->ID, i, POINTER);
-                            }
-                        };
+                        if (ImGui::Button(name.c_str(), POINTER->FLEET[i]->SIZE)) {};
                         ImGui::PopStyleColor();
                     }
 
@@ -1337,11 +1499,7 @@ int main(int, char**)
                         ImGui::PushStyleColor(ImGuiCol_Button, COLOR().DEFAULT);
                         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, COLOR().DEFAULT);
                         ImGui::PushStyleColor(ImGuiCol_ButtonActive, COLOR().DEFAULT);
-                        if (ImGui::Button(name.c_str(), POINTER->FLEET[i]->SIZE)) {
-                            if (POINTER->is_turn == true) {
-                                POINTER->BUTTON_FUNC(POINTER->FLEET[i]->ID, i, POINTER);
-                            }
-                        };
+                        if (ImGui::Button(name.c_str(), POINTER->FLEET[i]->SIZE)) {};
                         ImGui::PopStyleColor();
                     };
                 }

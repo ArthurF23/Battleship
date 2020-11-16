@@ -220,3 +220,44 @@ if (LENGTH == 5) {
                 };
             }
         }
+
+
+        #ifdef _WIN32
+		do
+		{
+			// Prompt the user for some text
+			//std::cout << "> ";
+			//std::cin >> userInput;
+			if (userInput.size() > 0) // Make sure the user has typed something
+			{
+				if (sendResult != SOCKET_ERROR)
+				{
+					// Wait for response
+					ZeroMemory(buf, 4096);
+					int bytesReceived = recv(sock, buf, 4096, 0);
+					if (bytesReceived > 0)
+					{
+						// Echo response to console
+						std::cout << "SERVER> " << std::string(buf, 0, bytesReceived) << '\n';
+					}
+					string s;
+					stringstream ss;
+					ss << buf;
+
+					ss >> s;
+					CLIENT::RECENTMESSAGE = s;
+					cout << s << endl;
+					if (s.substr(0, 5) == "START") {
+						cout << "STARTING..." << endl;
+						SERVER::IS_STARTED = true;
+					}
+
+					else if (s.substr(0, 5) == "NAME:") {
+						cout << "NAME RECIVED" << endl;
+					}
+				}
+			}
+
+		} while (userInput.size() > 0);
+
+		cout << "0 bytes" << endl;
