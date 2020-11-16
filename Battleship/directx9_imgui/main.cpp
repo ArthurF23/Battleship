@@ -1226,7 +1226,6 @@ int setup() {
     if (inp == 'j') {
         system("cls");
         cout << "What is the ip address of the host?" << endl;
-        //192.168.86.195
         cin >> IP;
         return 0;
     }
