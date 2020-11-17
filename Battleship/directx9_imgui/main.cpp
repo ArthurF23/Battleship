@@ -628,7 +628,7 @@ struct RADAR_ {
     int FORBIDDEN_BUTTONS[21] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
     11, 22, 33, 44, 55, 66, 77, 88, 99, 110}; // Buttons that arent supposed to be clicked
 
-    STATE_ STATE = STATE_::UNCLICKED;
+    atomic<STATE_> STATE = STATE_::UNCLICKED;
 };
 
 struct FLEET_ {
@@ -644,7 +644,7 @@ struct FLEET_ {
         SUNK
     };
 
-    STATE_ STATE = STATE_::UNCLICKED;
+    atomic<STATE_> STATE = STATE_::UNCLICKED;
 };
 
 class PLAYER {    
@@ -702,38 +702,38 @@ public:
                 PTR->FLEET[PTR->SHIPS->CARRIER->LOCATION[i]]->STATE = PTR->FLEET[PTR->SHIPS->CARRIER->LOCATION[i]]->STATE_::SUNK;
             };
             return PTR->SHIPS->CARRIER->LOCATION[0];
-        };
+        }
         //Battleship
-        if (PTR->SHIPS->BATTLESHIP->CHECK_SUNK() == true && PTR->SHIPS->BATTLESHIP->SUNK_DISPLAYED != true) {
+        else if (PTR->SHIPS->BATTLESHIP->CHECK_SUNK() == true && PTR->SHIPS->BATTLESHIP->SUNK_DISPLAYED != true) {
             for (int i = 0; i < 4; i++) {
                 PTR->FLEET[PTR->SHIPS->BATTLESHIP->LOCATION[i]]->STATE = PTR->FLEET[PTR->SHIPS->BATTLESHIP->LOCATION[i]]->STATE_::SUNK;
             };
             return PTR->SHIPS->BATTLESHIP->LOCATION[0];
-        };
+        }
         //Destroyer
-        if (PTR->SHIPS->DESTROYER->CHECK_SUNK() == true && PTR->SHIPS->DESTROYER->SUNK_DISPLAYED != true) {
+        else if (PTR->SHIPS->DESTROYER->CHECK_SUNK() == true && PTR->SHIPS->DESTROYER->SUNK_DISPLAYED != true) {
             for (int i = 0; i < 3; i++) {
                 PTR->FLEET[PTR->SHIPS->DESTROYER->LOCATION[i]]->STATE = PTR->FLEET[PTR->SHIPS->DESTROYER->LOCATION[i]]->STATE_::SUNK;
             };
             return PTR->SHIPS->DESTROYER->LOCATION[0];
-        };
+        }
         //Submarine
-        if (PTR->SHIPS->SUBMARINE->CHECK_SUNK() == true && PTR->SHIPS->SUBMARINE->SUNK_DISPLAYED != true) {
+        else if (PTR->SHIPS->SUBMARINE->CHECK_SUNK() == true && PTR->SHIPS->SUBMARINE->SUNK_DISPLAYED != true) {
             for (int i = 0; i < 3; i++) {
                 PTR->FLEET[PTR->SHIPS->SUBMARINE->LOCATION[i]]->STATE = PTR->FLEET[PTR->SHIPS->SUBMARINE->LOCATION[i]]->STATE_::SUNK;
             };
             return PTR->SHIPS->SUBMARINE->LOCATION[0];
-        };
+        }
         //Patrol Boat
-        if (PTR->SHIPS->PATROL_BOAT->CHECK_SUNK() == true && PTR->SHIPS->PATROL_BOAT->SUNK_DISPLAYED != true) {
+        else if (PTR->SHIPS->PATROL_BOAT->CHECK_SUNK() == true && PTR->SHIPS->PATROL_BOAT->SUNK_DISPLAYED != true) {
             PTR->SHIPS->PATROL_BOAT->SUNK_DISPLAYED = true;
             for (int i = 0; i < 2; i++) {
                 PTR->FLEET[PTR->SHIPS->PATROL_BOAT->LOCATION[i]]->STATE = PTR->FLEET[PTR->SHIPS->PATROL_BOAT->LOCATION[i]]->STATE_::SUNK;
             };
             return PTR->SHIPS->PATROL_BOAT->LOCATION[0];
-        };
+        }
 
-        return 0;
+        else { return 0; };
     };
 
     static void WAIT_TURN(PLAYER* PTR) {
@@ -745,15 +745,19 @@ public:
             int arr_pos = stoi(SERVER::RECENTMESSAGE.substr(2, SERVER::RECENTMESSAGE.length()));
 
             if (PTR->FLEET[arr_pos]->STATE == PTR->FLEET[arr_pos]->STATE_::BOAT) {
-                cout << "HIT" << endl;
-                PTR->FLEET[arr_pos]->STATE = PTR->FLEET[arr_pos]->STATE_::HIT;
+                cout << "HIT" << endl;                
+
                 int update_ships = PTR->UPDATE_SHIP(PTR, arr_pos);
+
                 if (update_ships == -1) {
                     SERVER::SEND("R@LOST");
                 }
+
                 else if (update_ships == 0) {
                     SERVER::SEND("R@HIT" + to_string(arr_pos));
+                    PTR->FLEET[arr_pos]->STATE = PTR->FLEET[arr_pos]->STATE_::HIT;
                 }
+
                 else {
                     cout << "SUNK" << endl;
                     int length;
@@ -761,6 +765,7 @@ public:
                     string name = PTR->FLEET[arr_pos]->SHIP_NAME;
                     if (name == "Carrier") {
                         length = 5;
+                        PTR->SHIPS->CARRIER->SUNK_DISPLAYED = true;
                         if (PTR->SHIPS->CARRIER->PLACER->ROTATION == PTR->SHIPS->CARRIER->PLACER->ROTATION_::HORIZONTAL) {
                             rotation = "H";
                         }
@@ -770,6 +775,7 @@ public:
                     }
                     else if (name == "Battleship") {
                         length = 4;
+                        PTR->SHIPS->BATTLESHIP->SUNK_DISPLAYED = true;
                         if (PTR->SHIPS->BATTLESHIP->PLACER->ROTATION == PTR->SHIPS->BATTLESHIP->PLACER->ROTATION_::HORIZONTAL) {
                             rotation = "H";
                         }
@@ -779,6 +785,7 @@ public:
                     }
                     else if (name == "Destroyer") {
                         length = 3;
+                        PTR->SHIPS->DESTROYER->SUNK_DISPLAYED = true;
                         if (PTR->SHIPS->DESTROYER->PLACER->ROTATION == PTR->SHIPS->DESTROYER->PLACER->ROTATION_::HORIZONTAL) {
                             rotation = "H";
                         }
@@ -788,6 +795,7 @@ public:
                     }
                     else if (name == "Submarine") {
                         length = 3;
+                        PTR->SHIPS->SUBMARINE->SUNK_DISPLAYED = true;
                         if (PTR->SHIPS->SUBMARINE->PLACER->ROTATION == PTR->SHIPS->SUBMARINE->PLACER->ROTATION_::HORIZONTAL) {
                             rotation = "H";
                         }
@@ -797,6 +805,7 @@ public:
                     }
                     else {
                         length = 2;
+                        PTR->SHIPS->PATROL_BOAT->SUNK_DISPLAYED = true;
                         if (PTR->SHIPS->PATROL_BOAT->PLACER->ROTATION == PTR->SHIPS->PATROL_BOAT->PLACER->ROTATION_::HORIZONTAL) {
                             rotation = "H";
                         }
@@ -840,6 +849,7 @@ public:
                     string name = PTR->FLEET[arr_pos]->SHIP_NAME;
                     if (name == "Carrier") {
                         length = 5;
+                        PTR->SHIPS->CARRIER->SUNK_DISPLAYED = true;
                         if (PTR->SHIPS->CARRIER->PLACER->ROTATION == PTR->SHIPS->CARRIER->PLACER->ROTATION_::HORIZONTAL) {
                             rotation = "H";
                         }
@@ -849,6 +859,7 @@ public:
                     }
                     else if (name == "Battleship") {
                         length = 4;
+                        PTR->SHIPS->BATTLESHIP->SUNK_DISPLAYED = true;
                         if (PTR->SHIPS->BATTLESHIP->PLACER->ROTATION == PTR->SHIPS->BATTLESHIP->PLACER->ROTATION_::HORIZONTAL) {
                             rotation = "H";
                         }
@@ -858,6 +869,7 @@ public:
                     }
                     else if (name == "Destroyer") {
                         length = 3;
+                        PTR->SHIPS->DESTROYER->SUNK_DISPLAYED = true;
                         if (PTR->SHIPS->DESTROYER->PLACER->ROTATION == PTR->SHIPS->DESTROYER->PLACER->ROTATION_::HORIZONTAL) {
                             rotation = "H";
                         }
@@ -867,6 +879,7 @@ public:
                     }
                     else if (name == "Submarine") {
                         length = 3;
+                        PTR->SHIPS->SUBMARINE->SUNK_DISPLAYED = true;
                         if (PTR->SHIPS->SUBMARINE->PLACER->ROTATION == PTR->SHIPS->SUBMARINE->PLACER->ROTATION_::HORIZONTAL) {
                             rotation = "H";
                         }
@@ -876,6 +889,7 @@ public:
                     }
                     else {
                         length = 2;
+                        PTR->SHIPS->PATROL_BOAT->SUNK_DISPLAYED = true;
                         if (PTR->SHIPS->PATROL_BOAT->PLACER->ROTATION == PTR->SHIPS->PATROL_BOAT->PLACER->ROTATION_::HORIZONTAL) {
                             rotation = "H";
                         }
@@ -913,22 +927,24 @@ public:
 
             //Server
             if (is_host == true) {
+                SERVER::RECENTMESSAGE = "";
                 thread sendth(SERVER::SEND, ("F@" + to_string(arrL)));
                 sendth.join();
                 cout << "waiting for response..." << endl;
                 do {
                     Sleep(1000);
                 } while (SERVER::RECENTMESSAGE == "");
+                cout << "&&& " << SERVER::RECENTMESSAGE << " &&&&" << endl;
                 if (SERVER::RECENTMESSAGE.substr(0, 5) == "R@HIT") {
                     int index = stoi(SERVER::RECENTMESSAGE.substr(5, SERVER::RECENTMESSAGE.length()));
-                    RADAR[index]->STATE = RADAR[index]->STATE_::HIT;
-                    RADAR[index]->ID += "\nHIT";
+                    PTR->RADAR[index]->STATE = PTR->RADAR[index]->STATE_::HIT;
+                    PTR->RADAR[index]->ID += "\nHIT";
                 }
 
                 else if (SERVER::RECENTMESSAGE.substr(0, 6) == "R@MISS") {
                     int index = stoi(SERVER::RECENTMESSAGE.substr(6, SERVER::RECENTMESSAGE.length()));
-                    RADAR[index]->STATE = RADAR[index]->STATE_::MISS;
-                    RADAR[index]->ID += "\nMISS";
+                    PTR->RADAR[index]->STATE = PTR->RADAR[index]->STATE_::MISS;
+                    PTR->RADAR[index]->ID += "\nMISS";
                 }
 
                 else if (SERVER::RECENTMESSAGE.substr(0, 6) == "R@LOST") {
@@ -958,6 +974,8 @@ public:
 
                     for (int i = 0, inc = location_of_sunk; i < length_of_sunk; i++, inc += increment) {
                         PTR->RADAR[inc]->STATE = PTR->RADAR[inc]->STATE_::SUNK;
+                        PTR->RADAR[inc]->ID += "\nSUNK";
+                        cout << inc << " " << PTR->RADAR[inc]->ID;
                     };
 
                 };
@@ -1278,9 +1296,9 @@ void get_name() {
             Sleep(1000);
         } while (SERVER::RECENTMESSAGE == "");
 
-        PLAYER_2->name = SERVER::RECENTMESSAGE.substr(5, SERVER::RECENTMESSAGE.length());
+        ENEMY_POINTER->name = SERVER::RECENTMESSAGE.substr(5, SERVER::RECENTMESSAGE.length());
         SERVER::RECENTMESSAGE = "";
-        cout << "Player 2 name: " << PLAYER_2->name << endl;
+        cout << "Player 2 name: " << ENEMY_POINTER->name << endl;
     }
     else {
         int inc = 0;
@@ -1293,9 +1311,9 @@ void get_name() {
             };
         } while (CLIENT::RECENTMESSAGE == "");
 
-        PLAYER_2->name = CLIENT::RECENTMESSAGE.substr(5, CLIENT::RECENTMESSAGE.length());
+        ENEMY_POINTER->name = CLIENT::RECENTMESSAGE.substr(5, CLIENT::RECENTMESSAGE.length());
         CLIENT::RECENTMESSAGE = "";
-        cout << "Player 1 name: " << PLAYER_2->name << endl;
+        cout << "Player 1 name: " << ENEMY_POINTER->name << endl;
     };
 }
 
@@ -1594,21 +1612,9 @@ int main(int, char**)
                 ImGui::InvisibleButton("INV", POINTER->RADAR[i]->SIZE);
             }
 
-            else {
-                if (POINTER->RADAR[i]->STATE == POINTER->RADAR[i]->STATE_::HIT) {
-                    ImGui::PushStyleColor(ImGuiCol_Button, COLOR().HIT);
-                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, COLOR().HIT);
-                    ImGui::PushStyleColor(ImGuiCol_ButtonActive, COLOR().HIT);
+            else {                
 
-                    if (ImGui::Button(name.c_str(), POINTER->RADAR[i]->SIZE)) {
-                        if (POINTER->is_turn == true) {
-                            //POINTER->BUTTON_FUNC(POINTER->RADAR[i]->ID, i, POINTER);
-                        }
-                    };
-                    ImGui::PopStyleColor();
-                }
-
-                else if (POINTER->RADAR[i]->STATE == POINTER->RADAR[i]->STATE_::MISS) {
+                if (POINTER->RADAR[i]->STATE == POINTER->RADAR[i]->STATE_::MISS) {
                     ImGui::PushStyleColor(ImGuiCol_Button, COLOR().MISS);
                     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, COLOR().MISS);
                     ImGui::PushStyleColor(ImGuiCol_ButtonActive, COLOR().MISS);
@@ -1634,7 +1640,20 @@ int main(int, char**)
                     ImGui::PopStyleColor();
                 }
 
-                else {
+                else if (POINTER->RADAR[i]->STATE == POINTER->RADAR[i]->STATE_::HIT) {
+                    ImGui::PushStyleColor(ImGuiCol_Button, COLOR().HIT);
+                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, COLOR().HIT);
+                    ImGui::PushStyleColor(ImGuiCol_ButtonActive, COLOR().HIT);
+
+                    if (ImGui::Button(name.c_str(), POINTER->RADAR[i]->SIZE)) {
+                        if (POINTER->is_turn == true) {
+                            //POINTER->BUTTON_FUNC(POINTER->RADAR[i]->ID, i, POINTER);
+                        }
+                    };
+                    ImGui::PopStyleColor();
+                }
+
+                else if (POINTER->RADAR[i]->STATE == POINTER->RADAR[i]->STATE_::UNCLICKED) {
                     ImGui::PushStyleColor(ImGuiCol_Button, COLOR().DEFAULT);
                     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, COLOR().DEFAULT);
                     ImGui::PushStyleColor(ImGuiCol_ButtonActive, COLOR().DEFAULT);
