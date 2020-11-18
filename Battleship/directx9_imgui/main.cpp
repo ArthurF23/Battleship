@@ -490,7 +490,7 @@ struct PLACER_ //Places the ship
     };
 };
 
-struct CARRIER_ //5 long ship carrier
+struct CARRIER_ //Carrier Structure
 {
     string NAME = "Carrier"; //Name of ship
     const static int LENGTH = 5; //Length of ship
@@ -502,6 +502,69 @@ struct CARRIER_ //5 long ship carrier
 
     bool CHECK_SUNK() //Checks if ship is sunk
     {
+        int counter = 0; //Counter for loop
+
+        for (int i = 0; i < LENGTH; i++) {
+            if (HOLES_HIT[i] == true) {
+                counter++;
+            }
+        }
+
+        if (counter == LENGTH) {
+            //If all holes are hit returns true
+            return true;
+        }
+        else {
+            return false;
+        };
+    };
+
+    PLACER_* PLACER = new PLACER_(LENGTH); //new PLACER_
+};
+
+struct BATTLESHIP_ //Battleship Structure
+{
+    string NAME = "Battleship"; //Name of ship
+    const static int LENGTH = 4; //Length of ship
+
+    int LOCATION[LENGTH]; //Location of the ship Pieces
+    bool IS_DESTROYED = false; //If ship is destroyed
+    bool HOLES_HIT[LENGTH] = { false, false, false, false }; //Individual holes and if their hit...
+    bool SUNK_DISPLAYED = false; //If displayed sunk
+
+    bool CHECK_SUNK() //Checks if ship is sunk
+    {
+        int counter = 0; //Increment for loop
+
+        for (int i = 0; i < LENGTH; i++) {
+            if (HOLES_HIT[i] == true) {
+                counter++;
+            }
+        }
+
+        if (counter == LENGTH) {
+            //If all holes are hit returns true
+            return true;
+        }
+        else {
+            return false;
+        };
+    };
+    PLACER_* PLACER = new PLACER_(LENGTH); //new PLACER_
+};
+
+struct DESTROYER_ //Destroyer Structure
+{
+    string NAME = "Destroyer"; //Name of ship
+    const static int LENGTH = 3; //Length of ship
+
+    int LOCATION[LENGTH]; //Location of ship
+    bool IS_DESTROYED = false; //If ships is destroyed
+    bool HOLES_HIT[LENGTH] = { false, false, false }; //Individual holes and if their hit...
+    bool SUNK_DISPLAYED = false; //If sunk is displayed
+
+    bool CHECK_SUNK()  //Checks if ship is sunk
+    {
         int counter = 0;
 
         for (int i = 0; i < LENGTH; i++) {
@@ -511,6 +574,7 @@ struct CARRIER_ //5 long ship carrier
         }
 
         if (counter == LENGTH) {
+            //If each hole is hit... returns true
             return true;
         }
         else {
@@ -518,19 +582,21 @@ struct CARRIER_ //5 long ship carrier
         };
     };
 
-    PLACER_* PLACER = new PLACER_(LENGTH);
+    PLACER_* PLACER = new PLACER_(LENGTH); //new PLACER_
 };
 
-struct BATTLESHIP_ {
-    string NAME = "Battleship";
-    const static int LENGTH = 4;
+struct SUBMARINE_ //Submarine Structure
+{
+    string NAME = "Submarine"; //Name of ship
+    const static int LENGTH = 3; //Length of ship
 
-    int LOCATION[LENGTH];
-    bool IS_DESTROYED = false;
-    bool HOLES_HIT[LENGTH] = { false, false, false, false };
-    bool SUNK_DISPLAYED = false;
+    int LOCATION[LENGTH]; //Location of ship
+    bool IS_DESTROYED = false; //If ship is destroyed
+    bool HOLES_HIT[LENGTH] = { false, false, false }; //Individual holes and if their hit...
+    bool SUNK_DISPLAYED = false; //If sunk has been displayed
 
-    bool CHECK_SUNK() {
+    bool CHECK_SUNK() //Checks if ship has been sunk
+    {
         int counter = 0;
 
         for (int i = 0; i < LENGTH; i++) {
@@ -540,26 +606,29 @@ struct BATTLESHIP_ {
         }
 
         if (counter == LENGTH) {
+            //If all holes have been hit.. returns true
             return true;
         }
         else {
             return false;
         };
     };
-    PLACER_* PLACER = new PLACER_(LENGTH);
+    PLACER_* PLACER = new PLACER_(LENGTH); //new PLACER_
 };
 
-struct DESTROYER_ {
-    string NAME = "Destroyer";
-    const static int LENGTH = 3;
+struct PATROL_BOAT_ //Patrol Boat Structure
+{
+    string NAME = "Patrol Boat"; //Name of ship
+    const static int LENGTH = 2; //Length of ship
 
-    int LOCATION[LENGTH];
-    bool IS_DESTROYED = false;
-    bool HOLES_HIT[LENGTH] = { false, false, false };
-    bool SUNK_DISPLAYED = false;
+    int LOCATION[LENGTH] = { 0, 0 }; //Location of ship
+    bool IS_DESTROYED = false; //If ship is destroyed
+    bool HOLES_HIT[LENGTH] = { false, false }; //Individual holes and if their hit...
+    bool SUNK_DISPLAYED = false; //If sunk has been displayed
 
-    bool CHECK_SUNK() {
-        int counter = 0;
+    bool CHECK_SUNK() //Checks to see if ship has sunk
+    {
+        int counter = 0; //Increment for loop
 
         for (int i = 0; i < LENGTH; i++) {
             if (HOLES_HIT[i] == true) {
@@ -568,140 +637,90 @@ struct DESTROYER_ {
         }
 
         if (counter == LENGTH) {
+            //If all holes have been hit... returns true
             return true;
         }
         else {
             return false;
         };
     };
-
-    PLACER_* PLACER = new PLACER_(LENGTH);
+    PLACER_* PLACER = new PLACER_(LENGTH); //new PLACER_
 };
 
-struct SUBMARINE_ {
-    string NAME = "Submarine";
-    const static int LENGTH = 3;
-
-    int LOCATION[LENGTH];
-    bool IS_DESTROYED = false;
-    bool HOLES_HIT[LENGTH] = { false, false, false };
-    bool SUNK_DISPLAYED = false;
-
-    bool CHECK_SUNK() {
-        int counter = 0;
-
-        for (int i = 0; i < LENGTH; i++) {
-            if (HOLES_HIT[i] == true) {
-                counter++;
-            }
-        }
-
-        if (counter == LENGTH) {
-            return true;
-        }
-        else {
-            return false;
-        };
-    };
-    PLACER_* PLACER = new PLACER_(LENGTH);
-};
-
-struct PATROL_BOAT_ {
-    string NAME = "Patrol Boat";
-    const static int LENGTH = 2;
-
-    int LOCATION[LENGTH] = { 0, 0 };
-    bool IS_DESTROYED = false;
-    bool HOLES_HIT[LENGTH] = { false, false };
-    bool SUNK_DISPLAYED = false;
-
-    bool CHECK_SUNK() {
-        int counter = 0;
-
-        for (int i = 0; i < LENGTH; i++) {
-            if (HOLES_HIT[i] == true) {
-                counter++;
-            }
-        }
-
-        if (counter == LENGTH) {
-            return true;
-        }
-        else {
-            return false;
-        };
-    };
-    PLACER_* PLACER = new PLACER_(LENGTH);
-};
-
-
-
-class SHIPS_CLASS {
+class SHIPS_CLASS //Class that holds all the ships
+{
 public:    
-    CARRIER_* CARRIER = new CARRIER_;
+    CARRIER_* CARRIER = new CARRIER_; //Carrier
 
-    BATTLESHIP_* BATTLESHIP = new BATTLESHIP_;
+    BATTLESHIP_* BATTLESHIP = new BATTLESHIP_; //Battleship
 
-    DESTROYER_* DESTROYER = new DESTROYER_;
+    DESTROYER_* DESTROYER = new DESTROYER_; //Destroyer
 
-    SUBMARINE_* SUBMARINE = new SUBMARINE_;
+    SUBMARINE_* SUBMARINE = new SUBMARINE_; //Submarine
 
-    PATROL_BOAT_* PATROL_BOAT = new PATROL_BOAT_;
+    PATROL_BOAT_* PATROL_BOAT = new PATROL_BOAT_; //Patrol Boat
 
-    bool VALID_POS[5] = { false, false, false, false, false };
+    bool VALID_POS[5] = { false, false, false, false, false }; //If each ship position is valid all will be true
 };
 
 
-struct RADAR_ {
-    string ID;
-    ImVec2 SIZE = ImVec2(50, 50);
-    enum STATE_ {
-        UNCLICKED,
-        MISS,
-        HIT,
-        SUNK
+struct RADAR_ //Player's radar... Window that you click to try and hit enemy ships... This is made into an 121 grid and each button has a clone of this struct
+{
+    string ID; //Button ID/name
+    ImVec2 SIZE = BUTTON_SIZE; //Button Size
+    enum STATE_ //Button State
+    {
+        UNCLICKED, //Not clicked... Default colored button
+        MISS, //Missed shot... Grey colored button
+        HIT, //Hit shot... Red colored button
+        SUNK //Sunk ship... Very dark blue colored button
     };
 
-    int FORBIDDEN_BUTTONS[21] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-    11, 22, 33, 44, 55, 66, 77, 88, 99, 110}; // Buttons that arent supposed to be clicked
+    int FORBIDDEN_BUTTONS[21] = // Buttons that arent supposed to be clicked
+    {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+    11, 22, 33, 44, 55, 66, 77, 88, 99, 110};
 
-    atomic<STATE_> STATE = STATE_::UNCLICKED;
+    atomic<STATE_> STATE = STATE_::UNCLICKED; //Button State... Starts as unclicked
 };
 
-struct FLEET_ {
-    string ID;
-    string SHIP_NAME;
-    int SHIP_CHUNK;
-    ImVec2 SIZE = ImVec2(50, 50);
-    enum STATE_ {
-        UNCLICKED,
-        MISS,
-        HIT,
-        BOAT,
-        SUNK
+struct FLEET_ //Player's fleet of ships.. displays the location of player's boat
+{
+    string ID; //Button ID/name
+    string SHIP_NAME; //If the button is occupied by a ship, this will be set to the ship's name
+    int SHIP_CHUNK; //The part of the the ship occupying the button
+    ImVec2 SIZE = BUTTON_SIZE; //Size of the button
+    enum STATE_ //State of the button
+    {
+        UNCLICKED, //Has not been clicked by enemy
+        MISS, //Missed by the enemy
+        HIT, //Enemy has hit one of your boats/ships
+        BOAT, //One of your boats/ships is occupying the button
+        SUNK //Sunk ship
     };
 
-    atomic<STATE_> STATE = STATE_::UNCLICKED;
+    atomic<STATE_> STATE = STATE_::UNCLICKED; //State of the button... Defaults to unclicked
 };
 
-class PLAYER {    
+class PLAYER //This is the main class that holds all the other structs and classes...
+{    
 private:
-    const static int RADAR_SIZE = 120;
+    const static int RADAR_SIZE = 121; //Size of the radar
 public:
-    atomic<bool> LOST = false;
+    atomic<bool> LOST = false; //If player has lost
 
-    atomic<bool> is_turn = false;
+    atomic<bool> is_turn = false; //if player's turn
 
-    string name = "Player";
+    string name = "Player"; //Player's name
 
-    SHIPS_CLASS* SHIPS = new SHIPS_CLASS;
+    SHIPS_CLASS* SHIPS = new SHIPS_CLASS; //Stores all ships
 
-    RADAR_* RADAR[121];
+    RADAR_* RADAR[RADAR_SIZE]; //Radar
 
-    FLEET_* FLEET[120];
+    FLEET_* FLEET[120]; //Fleet
 
 
-    static int UPDATE_SHIP(PLAYER* PTR, int arr_pos) {
+    static int UPDATE_SHIP(PLAYER* PTR, int arr_pos) //Update's all ship's info
+    {
         //Update the holes hit...
 
         //Carrier
@@ -773,18 +792,19 @@ public:
         else { return 0; };
     };
 
-    static void WAIT_TURN(PLAYER* PTR) {
+    static void WAIT_TURN(PLAYER* PTR) //Waits for other player to take their turn
+    {
         if (is_host == true) {
             do {
                 Sleep(1000);
             } while (SERVER::RECENTMESSAGE.substr(0, 2) != "F@");
             cout << SERVER::RECENTMESSAGE.substr(2, SERVER::RECENTMESSAGE.length()) << endl;
-            int arr_pos = stoi(SERVER::RECENTMESSAGE.substr(2, SERVER::RECENTMESSAGE.length()));
+            int arr_pos = stoi(SERVER::RECENTMESSAGE.substr(2, SERVER::RECENTMESSAGE.length())); //Position that the enemy has clicked
 
             if (PTR->FLEET[arr_pos]->STATE == PTR->FLEET[arr_pos]->STATE_::BOAT) {
                 cout << "HIT" << endl;                
 
-                int update_ships = PTR->UPDATE_SHIP(PTR, arr_pos);
+                int update_ships = PTR->UPDATE_SHIP(PTR, arr_pos); //Holds info of if the enemy has only hit you... sunk one of your ships... or if you've lost
 
                 if (update_ships == -1) {
                     SERVER::SEND("R@LOST");
@@ -796,9 +816,10 @@ public:
                 }
 
                 else {
+                    //Enemy has sunk one of your ships
                     cout << "SUNK" << endl;
-                    int length;
-                    string rotation;
+                    int length; //Length of ship
+                    string rotation; //Rotation of the ship
                     string name = PTR->FLEET[arr_pos]->SHIP_NAME;
                     if (name == "Carrier") {
                         length = 5;
@@ -861,7 +882,7 @@ public:
                 PTR->UPDATE_SHIP(PTR, arr_pos);
             }
 
-            SERVER::RECENTMESSAGE = "";
+            SERVER::RECENTMESSAGE = ""; //Reset the recent message
         }
         else {
             do {
@@ -1285,12 +1306,13 @@ public:
     
 };
 
-PLAYER* PLAYER_1;
-PLAYER* PLAYER_2;
-PLAYER* POINTER;
-PLAYER* ENEMY_POINTER;
+PLAYER* PLAYER_1; //Player 1 class... Host is always player 1
+PLAYER* PLAYER_2; //Player 2 class... Client is always player 2
+PLAYER* POINTER; //Pointer to whatever player you are
+PLAYER* ENEMY_POINTER; //Pointer to whatever player you aren't
 
-int setup() {
+int setup() //Setup the game
+{
     cout << "Are you hosting a game or joining a game? h (host) / j (join)" << endl;
     char inp = ' ';
     cin >> inp;
@@ -1314,7 +1336,9 @@ int setup() {
     }
 }
 
-void launch_comms(bool host_client) {
+void launch_comms//Start server
+(bool host_client //If you are hosting the game... or if you're joining the game...
+){
     if (host_client == true) {
         thread host(SERVER::START);
         host.join();
@@ -1326,7 +1350,8 @@ void launch_comms(bool host_client) {
     };
 }
 
-void get_name() {
+void get_name() //Get player name
+{
     if (is_host == true) {
         SERVER::SEND("NAME:" + POINTER->name);
         do {
