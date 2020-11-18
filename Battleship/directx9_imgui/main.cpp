@@ -85,72 +85,91 @@ static void HelpMarker(const char* desc)
         ImGui::EndTooltip();
     }
 }
-struct MAINWINDOW {
-    int WIDTH = 1280;
-    int HEIGHT = 800;
-};
 
-struct PLAYER_VIEW {
+struct MAINWINDOW //Main window information
+{
+    int WIDTH = 1280; //Width
+    int HEIGHT = 800; //Height
+}; 
+
+struct PLAYER_VIEW //Player attacking grid info on left of screen
+{
     
-    int WIDTH = ImGui::GetIO().DisplaySize.x / 2;
-    int HEIGHT = ImGui::GetIO().DisplaySize.y - 120;
+    int WIDTH = ImGui::GetIO().DisplaySize.x / 2; //Width of window
+    int HEIGHT = ImGui::GetIO().DisplaySize.y - 120; //Height of window
 
     
-    int X = ImGui::GetIO().DisplaySize.x - WIDTH;
-    int Y = 0;
+    int X = ImGui::GetIO().DisplaySize.x - WIDTH; //Location on X axis (evaluates to half of the inital window size)
+    int Y = 0; //Location on Y axis
+}; 
+
+
+struct PLAYER_RADAR //Player's own ship arrangement on right of screen
+{
+
+    int WIDTH = ImGui::GetIO().DisplaySize.x / 2; //Width of window
+    int HEIGHT = ImGui::GetIO().DisplaySize.y - 120; //Height of window
+
+
+    int X = 0; //Location on X axis
+    int Y = 0; //Location on Y axis
 };
 
-struct PLAYER_RADAR {
+struct INFO_WINDOW //Small window on the bottom left of the screen that says the turn
+{
+    int WIDTH = ImGui::GetIO().DisplaySize.x - PLAYER_RADAR().WIDTH; //Width of window
+    int HEIGHT = ImGui::GetIO().DisplaySize.y - PLAYER_RADAR().HEIGHT; //Height of window
 
-    int WIDTH = ImGui::GetIO().DisplaySize.x / 2;
-    int HEIGHT = ImGui::GetIO().DisplaySize.y - 120;
-
-
-    int X = 0;
-    int Y = 0;
+    int X = 0; //Location on X axis
+    int Y = PLAYER_RADAR().HEIGHT + 10; //Location on Y axis
 };
 
-struct INFO_WINDOW {
-    int WIDTH = ImGui::GetIO().DisplaySize.x - PLAYER_RADAR().WIDTH;
-    int HEIGHT = ImGui::GetIO().DisplaySize.y - PLAYER_RADAR().HEIGHT;
-
-    int X = 0;
-    int Y = PLAYER_RADAR().HEIGHT + 10;
+struct COLOR //Colors that will be used on buttons when clicked by player
+{
+    ImVec4 HIT = ImVec4(255.0f, 0.0f, 0.0f, 1.0f); //Red
+    ImVec4 MISS = ImVec4(0.255f, 0.255f, 0.255f, 1.0f); //Grey
+    ImVec4 SUNK = ImVec4(0.053f, 0.053f, 0.105f, 1.0f); //Very Dark Blue
+    ImVec4 BOAT = ImVec4(0.040f, 0.050f, 0.169f, 1.0f); //Not as dark Dark Blue
+    ImVec4 DEFAULT = ImVec4(0.26f, 0.59f, 0.98f, 0.40f); //Default light blue used by ImGui
 };
 
-struct COLOR {
-    ImVec4 HIT = ImVec4(255.0f, 0.0f, 0.0f, 1.0f);
-    ImVec4 MISS = ImVec4(0.255f, 0.255f, 0.255f, 1.0f);
-    ImVec4 SUNK = ImVec4(0.053f, 0.053f, 0.105f, 1.0f);
-    ImVec4 BOAT = ImVec4(0.040f, 0.050f, 0.169f, 1.0f);
-    ImVec4 DEFAULT = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
-};
+ImVec2 BUTTON_SIZE = ImVec2(50, 50); //Size of buttons
 
-ImVec2 BUTTON_SIZE = ImVec2(50, 50);
-
-struct PLACER_ {
-    int LENGTH;
-    int MAX_ARR_SIZE = 120;
+struct PLACER_ //Places the ship
+{
+    int LENGTH; //Length of ship that will be passed through
+    int MAX_ARR_SIZE = 120; //Max array size so i dont go over the grid or radar size...
 
     int FORBIDDEN_BUTTONS[21] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
     11, 22, 33, 44, 55, 66, 77, 88, 99, 110 }; // Buttons that arent supposed to be clicked
 
-    PLACER_(int LENGTH_) {
+    PLACER_(int LENGTH_ //Length that will be passed to the varible: LENGTH
+    ) //Constructor
+    {
         LENGTH = LENGTH_;        
     };
 
-    enum ROTATION_ {
-        HORIZONTAL,
-        VERTICAL
+    enum ROTATION_ //Rotation of the ship
+    {
+        HORIZONTAL, //Left to Right... aka X axis
+        VERTICAL //Up and Down... aka Y axis
     };    
 
-    ROTATION_ ROTATION = ROTATION_::HORIZONTAL;
-    int ROTATION_MATH[2] = {1, 11}; //+1=Horizontal, +11=Vertical
+    ROTATION_ ROTATION = ROTATION_::HORIZONTAL; //The Rotation of the ship
+    int ROTATION_MATH[2] = {1, 11}; //Increment of ship placement to determine if it will go Left to Right (Horizontal): +1 or Up and Down (Vertical): +11
     
-    string SMART_PLACER_POS[5];
+    string SMART_PLACER_POS[5]; //Position of the ship that will be passed the the actual location
 
-    bool OVERLAP_FORBIDDEN_DETECT(int LOCATION, int INCREMENT_1, int INCREMENT_2, int INCREMENT_3, int INCREMENT_4, int LENGTH_) {
-        bool BAD_POS = false;
+    bool OVERLAP_FORBIDDEN_DETECT //Detects if any of the ships are on the forbidden buttons or exceeds the grid
+    (int LOCATION, //Location of ship
+        int INCREMENT_1, //Increment 1 will be either 1 or 11
+        int INCREMENT_2, //Increment 2 will be either 2 or 22
+        int INCREMENT_3, //Increment 3 will be either 3 or 33
+        int INCREMENT_4, //Increment 4 will be either 4 or 44
+        int LENGTH_ //Length of ship
+    ) 
+    {
+        bool BAD_POS = false; //if there is a overlap with a forbidden button or if the ship will exceed the array/gid
         
         for (int i = 0; i < 21; i++) {
             if (LOCATION + INCREMENT_1 == FORBIDDEN_BUTTONS[i]) {
@@ -197,13 +216,22 @@ struct PLACER_ {
         return BAD_POS;
     }
 
-    bool COLLISION_DETECTION(int LOCATION, int INCREMENT, int LENGTH_,
-        int CARRIER_POS[5], int BATTLESHIP_POS[4], int DESTROYER_POS[3], int SUBMARINE_POS[3], int PATROL_BOAT_POS[2], string SHIP_NAME) {
-        //This is to check to make sure that the ships are not overlapping
+    bool COLLISION_DETECTION //Checks to make sure that the ships are not overlapping/colliding
+    (int LOCATION, //Location of starting pos of ship
+        int INCREMENT, //The increment will either be 1 or 11 depending on if the ship is vertical or horizontal
+        int LENGTH_, //Length of ship
+        int CARRIER_POS[5], //Position of Carrier
+        int BATTLESHIP_POS[4], //Position of Battleship
+        int DESTROYER_POS[3], //Position of Destroyer
+        int SUBMARINE_POS[3], //Position of Submarine
+        int PATROL_BOAT_POS[2], //Position of Patrol Boat
+        string SHIP_NAME //Ship name
+    ) 
+    {        
         /*I can use almost LENGTH_ to figure out what ship it is... but the destroyer and submarine have the same length so i may have to add something
         to determine what boat im dealing with if needed*/
         cout << SHIP_NAME << " INCREMENT = " << INCREMENT << endl;
-        bool COLLISION = false;
+        bool COLLISION = false; //If there is a collision this will be true
 
 
         if (SHIP_NAME == "Carrier") {
@@ -426,8 +454,15 @@ struct PLACER_ {
     };
 
 
-    bool SMART_PLACER(int LOCATION, int CARRIER_POS[5], int BATTLESHIP_POS[4],
-        int DESTROYER_POS[3], int SUBMARINE_POS[3], int PATROL_BOAT_POS[2], string SHIP_NAME) {
+    bool SMART_PLACER //Determines if there is a collision or overlap of some sort is there isnt then it gives the positions for the ship
+    (int LOCATION, //Location of the ship
+        int CARRIER_POS[5], //Position of carrier
+        int BATTLESHIP_POS[4], //Position of Battleship
+        int DESTROYER_POS[3], //Position of Destroyer
+        int SUBMARINE_POS[3], //Position of Submarine
+        int PATROL_BOAT_POS[2], //Position of Patrol Boat
+        string SHIP_NAME //Name of Ship
+    ) {
         if (ROTATION == ROTATION_::HORIZONTAL && 
             OVERLAP_FORBIDDEN_DETECT(LOCATION, 1, 2, 3, 4, LENGTH) == false &&
             COLLISION_DETECTION(LOCATION, 1, LENGTH, CARRIER_POS, BATTLESHIP_POS, DESTROYER_POS, SUBMARINE_POS, PATROL_BOAT_POS, SHIP_NAME) == false) {
@@ -455,16 +490,18 @@ struct PLACER_ {
     };
 };
 
-struct CARRIER_ {
-    string NAME = "Carrier";
-    const static int LENGTH = 5;
+struct CARRIER_ //5 long ship carrier
+{
+    string NAME = "Carrier"; //Name of ship
+    const static int LENGTH = 5; //Length of ship
 
-    int LOCATION[LENGTH];
-    bool IS_DESTROYED = false;
-    bool HOLES_HIT[LENGTH] = { false, false, false, false, false };
-    bool SUNK_DISPLAYED = false;
+    int LOCATION[LENGTH]; //Location array that is as long as the ship
+    bool IS_DESTROYED = false; //If true... the ship is destroyed
+    bool HOLES_HIT[LENGTH] = { false, false, false, false, false }; //Individual holes and if their hit...
+    bool SUNK_DISPLAYED = false; //if the sunk has been displayed so it doesnt repeat the sunk function and all that...
 
-    bool CHECK_SUNK() {
+    bool CHECK_SUNK() //Checks if ship is sunk
+    {
         int counter = 0;
 
         for (int i = 0; i < LENGTH; i++) {
@@ -1347,8 +1384,9 @@ int main(int, char**)
 
     system("cls");
     if (is_host == true) {
-        do {
+        do {            
             system("ipconfig");
+            cout << SERVER::IP_ADDR << endl;
             cout << "Waiting for connection";
             Sleep(1000);
             cout << ".";
