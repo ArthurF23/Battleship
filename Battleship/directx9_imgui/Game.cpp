@@ -2,7 +2,7 @@
 #include <atomic>
 #include <sstream>
 using namespace std;
-
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 #ifdef _WIN32 // for Windows systems
 
 #include <WS2tcpip.h>
@@ -19,13 +19,67 @@ using namespace std;
 #include <string>
 
 #endif
+struct IPv4
+{
+	unsigned char b1, b2, b3, b4;
+
+	string to_str() {
+		string s = to_string(b1) + "." + to_string(b2) + "." + to_string(b3) + "." + to_string(b4);
+		
+		return s;
+	}
+};
+
+bool getMyIP(IPv4* myIP)
+{
+	char szBuffer[1024];
+
+#ifdef WIN32
+	WSADATA wsaData;
+	WORD wVersionRequested = MAKEWORD(2, 0);
+	if (::WSAStartup(wVersionRequested, &wsaData) != 0)
+		return false;
+#endif
+
+
+	if (gethostname(szBuffer, sizeof(szBuffer)) == SOCKET_ERROR)
+	{
+#ifdef WIN32
+		WSACleanup();
+#endif
+		return false;
+	}
+
+	struct hostent* host = gethostbyname(szBuffer);
+	if (host == NULL)
+	{
+#ifdef WIN32
+		WSACleanup();
+#endif
+		return false;
+	}
+
+	//Obtain the computer's IP
+	myIP->b1 = ((struct in_addr*)(host->h_addr))->S_un.S_un_b.s_b1;
+	myIP->b2 = ((struct in_addr*)(host->h_addr))->S_un.S_un_b.s_b2;
+	myIP->b3 = ((struct in_addr*)(host->h_addr))->S_un.S_un_b.s_b3;
+	myIP->b4 = ((struct in_addr*)(host->h_addr))->S_un.S_un_b.s_b4;
+
+#ifdef WIN32
+	WSACleanup();
+#endif
+	return true;
+}
 SOCKET clientSocket;
 SOCKET sock;
+bool namerecived = false;
 #include "Game.h"
 namespace std {
 	bool SERVER::IS_STARTED = false;
 
 	bool CLIENT::IS_STARTED = false;
+
+	string CLIENT::NAME = "";
 
 	string SERVER::RECENTMESSAGE = "";
 
@@ -415,6 +469,12 @@ namespace std {
 
 	};
 
+	string SERVER::GET_IP() {
+		IPv4* ip = new IPv4;
+		getMyIP(ip);
+		return ip->to_str();
+	};
+
 	int SERVER::START() {
 		// Initialize winsock
 #ifdef _WIN32
@@ -455,7 +515,7 @@ namespace std {
 		hint.sin_port = htons(54000); // host to network shot
 
 #ifdef _WIN32
-		hint.sin_addr.S_un.S_addr = INADDR_ANY;
+		hint.sin_addr.S_un.S_addr = INADDR_ANY;		
 		bind(listening, (sockaddr*)&hint, sizeof(hint));
 
 #else
@@ -481,7 +541,7 @@ namespace std {
 
 #endif
 
-		// Wait for a connection
+		// Wait for a connection		
 		sockaddr_in client;
 #ifdef _WIN32
 		int clientSize = sizeof(client);
@@ -574,7 +634,7 @@ namespace std {
 			std::cout << "CLIENT> " << std::string(buf, 0, bytesReceived) << endl;
 
 			// Echo message back to client
-			send(clientSocket, buf, bytesReceived + 1, 0);
+			//send(clientSocket, buf, bytesReceived + 1, 0);
 			string s;
 			stringstream ss;
 			ss << buf;
@@ -726,7 +786,11 @@ namespace std {
 			}
 
 			else if (s.substr(0, 5) == "NAME:") {
-				cout << "NAME RECIVED" << endl;
+				if (namerecived == false) {
+					namerecived = true;
+					cout << "NAME RECIVED " << s << endl;
+					CLIENT::NAME = s;
+				};
 			}
 		}
 

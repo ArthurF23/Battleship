@@ -1409,9 +1409,10 @@ int main(int, char**)
 
     system("cls");
     if (is_host == true) {
+        POINTER->is_turn = true;
+        ENEMY_POINTER->is_turn = false;
         do {            
-            system("ipconfig");
-            cout << SERVER::IP_ADDR << endl;
+            cout << "IP: " << SERVER::GET_IP() << endl;
             cout << "Waiting for connection";
             Sleep(1000);
             cout << ".";
@@ -1424,6 +1425,8 @@ int main(int, char**)
         } while (SERVER::CONNECTED_TO_CLIENT == false);
     }
     else if (is_host == false) {
+        POINTER->is_turn = false;
+        ENEMY_POINTER->is_turn = true;
         do {
             cout << "Waiting for connection";
             Sleep(1000);
@@ -1734,8 +1737,19 @@ int main(int, char**)
         ImGui::End();        
         }
 
-        //Waiting window
-        if (show_game_window == true && show_config_window == false && (SERVER::IS_STARTED == false || CLIENT::IS_STARTED == false) && POINTER->LOST == false && ENEMY_POINTER->LOST == false) {
+        //Waiting window Host
+        if (show_game_window == true && show_config_window == false && CLIENT::IS_STARTED == false && POINTER->LOST == false && ENEMY_POINTER->LOST == false) {
+            ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x / 2, (ImGui::GetIO().DisplaySize.y / 2) - 100));
+            ImGui::SetNextWindowSize(ImVec2(400, 100));
+
+            ImGui::Begin("Waiting...", (bool*)false, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+            string waiting = "Waiting for " + ENEMY_POINTER->name + " to start...";
+            ImGui::Text(waiting.c_str());
+            ImGui::End();
+        }
+
+        //Waiting window Client
+        if (show_game_window == true && show_config_window == false && SERVER::IS_STARTED == false && POINTER->LOST == false && ENEMY_POINTER->LOST == false) {
             ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x / 2, (ImGui::GetIO().DisplaySize.y / 2) - 100));
             ImGui::SetNextWindowSize(ImVec2(400, 100));
 
@@ -1817,6 +1831,9 @@ int main(int, char**)
                     }                    
                     ImGui::TreePop();
                 }
+
+                ImGui::Text(("Player 1: " + POINTER->name).c_str());
+                ImGui::Text(("Player 2: " + ENEMY_POINTER->name).c_str());
                 
                 
 

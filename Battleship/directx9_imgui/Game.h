@@ -5,6 +5,9 @@ namespace std {
 
 	class SERVER {
 	public:
+
+		static string GET_IP();
+
 		static int START();
 
 		static int SEND(string msg);
@@ -27,6 +30,8 @@ namespace std {
 		static bool IS_STARTED;
 
 		static string RECENTMESSAGE;
+
+		static string NAME;
 	};
 
 	class GAME {
